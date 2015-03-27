@@ -9,6 +9,7 @@
     <version>0.1.0</version>
     <name>recognition-server</name>
 
+    <!-- For CMU Sphinx -->
     <repositories>
         <repository>
             <id>snapshots-repo</id>
@@ -88,6 +89,13 @@
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>
 			<version>1.7.10</version>
+		</dependency>
+		
+		<!-- Guava -->
+        <dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>18.0</version>
 		</dependency>
         
         <!-- Test -->
