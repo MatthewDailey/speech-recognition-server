@@ -7,7 +7,7 @@ import org.junit.Test;
 public class MavenBuildTest {
 
 	/**
-	 * Verify that mvn test is running unit tests.
+	 * Verify that mvn test is running unit tests with mvn test.
 	 */
 	@Test
 	public void testBuildRunsTest() {
