@@ -32,7 +32,7 @@ public class S3Recognize {
 	
 	@GET 
 	@Produces("application/json")
-	public List<WordResultBean> get(@QueryParam("s3bucket") String s3bucket, 
+	public String get(@QueryParam("s3bucket") String s3bucket, 
 					  @QueryParam("s3file") String s3key) throws IOException {
 		log.debug("Received request with params s3bucket={} and s3key={}", s3bucket, s3key);
 		
@@ -63,6 +63,6 @@ public class S3Recognize {
     	}
 		
     	log.debug("Completed request!");
-		return beans;
+		return "Success";
 	}
 }
