@@ -35,6 +35,8 @@ public class S3Recognize {
 	public List<WordResultBean> get(@QueryParam("s3bucket") String s3bucket, 
 					  @QueryParam("s3file") String s3key) throws IOException {
 		log.debug("Received request with params s3bucket={} and s3key={}", s3bucket, s3key);
+		Stopwatch totalTimeStopwatch = Stopwatch.createStarted();
+		
 		
 		Stopwatch createRecognizerStopwatch = Stopwatch.createStarted();
     	Configuration configuration = new Configuration();
@@ -63,7 +65,8 @@ public class S3Recognize {
     				LogMath.getLogMath().logToLinear((float)wr.getConfidence())));
     	}
 		log.debug(stringBuilder.toString());
-    	log.debug("Completed request!");
+    	log.debug("Completed request in {} ms", totalTimeStopwatch.elapsed(TimeUnit.MILLISECONDS));
 		return beans;
 	}
+
 }
