@@ -28,11 +28,11 @@ import edu.cmu.sphinx.util.LogMath;
 @Path("s3recognize")
 public class S3Recognize {
 
-	private final static Logger log = LoggerFactory.getLogger("s3recognize");
+	private final static Logger log = LoggerFactory.getLogger(S3Recognize.class);
 	
 	@GET 
 	@Produces("application/json")
-	public String get(@QueryParam("s3bucket") String s3bucket, 
+	public List<WordResultBean> get(@QueryParam("s3bucket") String s3bucket, 
 					  @QueryParam("s3file") String s3key) throws IOException {
 		log.debug("Received request with params s3bucket={} and s3key={}", s3bucket, s3key);
 		
@@ -56,13 +56,14 @@ public class S3Recognize {
     	log.debug("Finished recognition. Took {} ms.", recognizeStopwatch.elapsed(TimeUnit.MILLISECONDS));
     	
     	List<WordResultBean> beans = Lists.newArrayList();
+    	StringBuilder stringBuilder = new StringBuilder().append("Transciption: ");
     	for (WordResult wr : result.getWords()) {
-    		log.info(wr.toString());
+    		stringBuilder.append(wr.toString()).append(" ");
     		beans.add(new WordResultBean(wr.getWord().toString(),  
     				LogMath.getLogMath().logToLinear((float)wr.getConfidence())));
     	}
-		
+		log.debug(stringBuilder.toString());
     	log.debug("Completed request!");
-		return "Success";
+		return beans;
 	}
 }
