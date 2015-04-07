@@ -70,6 +70,7 @@
     -->
     <Connector port="8080" protocol="HTTP/1.1"
                connectionTimeout="200000"
+               keepAliveTimeout="-1"
                redirectPort="8443" />
     <!-- A "Connector" using the shared thread pool-->
     <!--
