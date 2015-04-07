@@ -1,4 +1,4 @@
-package co.speechre.api;
+package com.saypenis.speech.api;
 
 import java.io.IOException;
 

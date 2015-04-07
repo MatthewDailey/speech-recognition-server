@@ -1,4 +1,4 @@
-package co.speechre.api;
+package com.saypenis.speech.api;
 
 import java.io.IOException;
 import java.util.List;
@@ -12,12 +12,11 @@ import javax.ws.rs.QueryParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import co.speechre.api.serialization.WordResultBean;
-import co.speechre.aws.AWS;
-
 import com.amazonaws.services.s3.model.S3Object;
 import com.google.common.base.Stopwatch;
 import com.google.common.collect.Lists;
+import com.saypenis.speech.api.serialization.WordResultBean;
+import com.saypenis.speech.aws.AWS;
 
 import edu.cmu.sphinx.api.Configuration;
 import edu.cmu.sphinx.api.SpeechResult;

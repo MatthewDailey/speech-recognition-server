@@ -1,4 +1,4 @@
-package co.speechre.aws;
+package com.saypenis.speech.aws;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
