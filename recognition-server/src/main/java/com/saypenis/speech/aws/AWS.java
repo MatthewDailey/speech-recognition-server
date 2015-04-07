@@ -1,4 +1,4 @@
-package co.speechre.aws;
+package com.saypenis.speech.aws;
 
 import javax.inject.Singleton;
 

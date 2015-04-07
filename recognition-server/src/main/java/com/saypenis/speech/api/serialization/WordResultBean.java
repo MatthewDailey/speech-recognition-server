@@ -1,4 +1,4 @@
-package co.speechre.api.serialization;
+package com.saypenis.speech.api.serialization;
 
 import javax.xml.bind.annotation.XmlRootElement;
 
