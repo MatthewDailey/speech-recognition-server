@@ -1,4 +1,4 @@
-package co.speechre;
+package com.saypenis.speech;
 
 import static org.junit.Assert.assertTrue;
 
