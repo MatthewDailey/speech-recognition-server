@@ -9,7 +9,10 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.CompletionCallback;
 import javax.ws.rs.container.Suspended;
+import javax.ws.rs.container.TimeoutHandler;
+import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +40,27 @@ public class S3Recognize {
 	public void get(@Suspended final AsyncResponse asyncResponse,
 					@QueryParam("s3bucket") final String s3bucket, 
 					@QueryParam("s3file") final String s3key) throws IOException {
+		
+		asyncResponse.register(new CompletionCallback() {
+			@Override
+			public void onComplete(Throwable throwable) {
+				if (throwable == null) {
+					log.debug("Successful response logged from completion handler.");
+				} else {
+					log.debug("Failure response logged from completion handler.");
+				}
+			}
+		});
+		
+		asyncResponse.setTimeoutHandler(new TimeoutHandler() {
+			@Override
+			public void handleTimeout(AsyncResponse asyncResponse) {
+				asyncResponse.resume(Response.status(Response.Status.SERVICE_UNAVAILABLE)
+	                    .entity("Operation time out.").build());
+			}
+		});
+		asyncResponse.setTimeout(90, TimeUnit.SECONDS);
+		
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
