@@ -8,6 +8,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,8 +34,23 @@ public class S3Recognize {
 	
 	@GET 
 	@Produces("application/json")
-	public List<WordResultBean> get(@QueryParam("s3bucket") String s3bucket, 
-					  @QueryParam("s3file") String s3key) throws IOException {
+	public void get(@Suspended final AsyncResponse asyncResponse,
+					@QueryParam("s3bucket") final String s3bucket, 
+					@QueryParam("s3file") final String s3key) throws IOException {
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					asyncResponse.resume(handleS3Request(s3bucket, s3key));
+				} catch (IOException e) {
+					asyncResponse.resume("Failed with IOException " + e);
+				}
+			}
+			
+		}).start();
+	}
+
+	private List<WordResultBean> handleS3Request(String s3bucket, String s3key) throws IOException {
 		log.debug("Received request with params s3bucket={} and s3key={}", s3bucket, s3key);
 		Stopwatch totalTimeStopwatch = Stopwatch.createStarted();
 		
@@ -66,7 +83,7 @@ public class S3Recognize {
     	}
 		log.debug(stringBuilder.toString());
     	log.debug("Completed request in {} ms", totalTimeStopwatch.elapsed(TimeUnit.MILLISECONDS));
-		return beans;
+		return beans;		
 	}
-
+	
 }
