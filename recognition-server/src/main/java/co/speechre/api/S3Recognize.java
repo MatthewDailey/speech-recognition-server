@@ -89,7 +89,7 @@ public class S3Recognize {
     	log.debug("Finished creating recognized. It took {} ms", createRecognizerStopwatch.elapsed(TimeUnit.MILLISECONDS));
 
     	Stopwatch s3FetchStopwatch = Stopwatch.createStarted();
-    	S3Object file = AWS.getS3().getObject(s3bucket, s3key);
+    	S3Object file = AWS.services.s3().getObject(s3bucket, s3key);
     	log.debug("Finished fetching {} from s3. Took {} ms.", s3key, s3FetchStopwatch.elapsed(TimeUnit.MILLISECONDS));
     	
     	Stopwatch recognizeStopwatch = Stopwatch.createStarted();
