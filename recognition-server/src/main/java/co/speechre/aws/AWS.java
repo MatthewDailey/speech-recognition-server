@@ -1,5 +1,7 @@
 package co.speechre.aws;
 
+import javax.inject.Singleton;
+
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
@@ -7,6 +9,7 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 
+@Singleton
 public final class AWS {
 
 	private AWS() {}
