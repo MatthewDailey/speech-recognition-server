@@ -1,8 +1,6 @@
 package com.saypenis.speech.api.serialization;
 
-import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement
 public final class WordResultBean {
 	
 	public String word;

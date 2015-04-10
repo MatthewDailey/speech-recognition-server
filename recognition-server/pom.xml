@@ -109,6 +109,13 @@
 			<version>18.0</version>
 		</dependency>
         
+        <!-- gson for serialization cus fuck jaxb -->
+        <dependency>
+		    <groupId>com.google.code.gson</groupId>
+		    <artifactId>gson</artifactId>
+		    <version>2.3.1</version>
+		</dependency>
+        
         <!-- Test -->
         <dependency>
             <groupId>junit</groupId>

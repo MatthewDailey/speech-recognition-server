@@ -10,6 +10,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.container.AsyncResponse;
 import javax.ws.rs.container.Suspended;
+import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +19,6 @@ import org.slf4j.LoggerFactory;
 import com.amazonaws.services.s3.model.S3Object;
 import com.google.common.base.Stopwatch;
 import com.saypenis.speech.api.serialization.SerializationUtils;
-import com.saypenis.speech.api.serialization.WordResultBean;
 import com.saypenis.speech.aws.AwsSupplier;
 import com.saypenis.speech.recognition.CmuSphinxRecognitionService;
 
@@ -39,16 +40,21 @@ public class S3RecognizeResource {
 			@Override
 			public void run() {
 				try {
-					asyncResponse.resume(processS3RecognizeRequest(s3bucket, s3key));
+					asyncResponse.resume(Response.ok(
+							SerializationUtils.serialize(processS3RecognizeRequest(s3bucket, s3key)))
+							.build());
 				} catch (IOException e) {
-					log.error("Async s3recognize failed with exception " + e);
+					log.error("Async s3recognize failed with IOException " + e);
+					asyncResponse.resume("Fail with exception: " + e);
+				} catch (JAXBException e) {
+					log.error("Async s3recognize failed with JAXBException " + e);
 					asyncResponse.resume("Fail with exception: " + e);
 				}
 			}
 		}).start();
 	}
 	
-	private List<WordResultBean> processS3RecognizeRequest(String s3bucket, String s3key) throws IOException {
+	private List<WordResult> processS3RecognizeRequest(String s3bucket, String s3key) throws IOException {
 		log.debug("Received request with params s3bucket={} and s3key={}", s3bucket, s3key);
 		Stopwatch totalTimeStopwatch = Stopwatch.createStarted();
 		
@@ -58,10 +64,8 @@ public class S3RecognizeResource {
     	
     	List<WordResult> results = new CmuSphinxRecognitionService().recognize(file.getObjectContent());
     	
-    	List<WordResultBean> beans = SerializationUtils.serialize(results);
-    	
     	log.debug("Completed request in {} ms", totalTimeStopwatch.elapsed(TimeUnit.MILLISECONDS));
-		return beans;		
+		return results;		
 	}
 
 }
