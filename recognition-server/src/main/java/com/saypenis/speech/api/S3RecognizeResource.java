@@ -23,10 +23,10 @@ import com.saypenis.speech.recognition.CmuSphinxRecognitionService;
 
 import edu.cmu.sphinx.result.WordResult;
 
-@Path("s3recognize")
-public class S3Recognize {
+@Path("recognize/s3")
+public class S3RecognizeResource {
 
-	private final static Logger log = LoggerFactory.getLogger(S3Recognize.class);
+	private final static Logger log = LoggerFactory.getLogger(S3RecognizeResource.class);
 	
 	@GET 
 	@Produces("application/json")

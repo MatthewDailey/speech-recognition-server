@@ -14,9 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Path("/recognize/upload")
-public class UploadRecognize {
+public class UploadRecognizeResource {
 	
-	private static final Logger log = LoggerFactory.getLogger(UploadRecognize.class);
+	private static final Logger log = LoggerFactory.getLogger(UploadRecognizeResource.class);
 
 	@POST
 	@Consumes(MediaType.MULTIPART_FORM_DATA)

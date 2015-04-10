@@ -12,9 +12,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Path("timeout")
-public class TimeoutTest {
+public class TimeoutResource {
 
-	private final static Logger log = LoggerFactory.getLogger(TimeoutTest.class);
+	private final static Logger log = LoggerFactory.getLogger(TimeoutResource.class);
 	
 	@GET 
 	@Produces("application/json")
