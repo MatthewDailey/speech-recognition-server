@@ -18,7 +18,7 @@ import com.amazonaws.services.s3.model.S3Object;
 import com.google.common.base.Stopwatch;
 import com.saypenis.speech.api.serialization.SerializationUtils;
 import com.saypenis.speech.api.serialization.WordResultBean;
-import com.saypenis.speech.aws.AWS;
+import com.saypenis.speech.aws.AwsSupplier;
 import com.saypenis.speech.recognition.CmuSphinxRecognitionService;
 
 import edu.cmu.sphinx.result.WordResult;
@@ -53,7 +53,7 @@ public class S3Recognize {
 		Stopwatch totalTimeStopwatch = Stopwatch.createStarted();
 		
 		Stopwatch s3FetchStopwatch = Stopwatch.createStarted();
-    	S3Object file = AWS.getS3().getObject(s3bucket, s3key);
+    	S3Object file = AwsSupplier.instance.s3().getObject(s3bucket, s3key);
     	log.debug("Finished fetching {} from s3. Took {} ms.", s3key, s3FetchStopwatch.elapsed(TimeUnit.MILLISECONDS));
     	
     	List<WordResult> results = new CmuSphinxRecognitionService().recognize(file.getObjectContent());
