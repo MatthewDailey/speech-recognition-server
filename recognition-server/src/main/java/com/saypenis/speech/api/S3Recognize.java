@@ -45,7 +45,7 @@ public class S3Recognize {
 					asyncResponse.resume("Fail with exception: " + e);
 				}
 			}
-		});
+		}).start();
 	}
 	
 	private List<WordResultBean> processS3RecognizeRequest(String s3bucket, String s3key) throws IOException {
