@@ -51,20 +51,22 @@ public final class RecognitionServiceProvider {
 	}
 	
 	public static RecognitionService get() {
-		provider.enqueueNewRecognizerNonBlocking();
+		RecognitionService result;
 		try {
-			return new CmuSphinxRecognitionService(provider.recognizerQueue.poll(1, TimeUnit.MINUTES));
+			result = new CmuSphinxRecognitionService(provider.recognizerQueue.poll(1, TimeUnit.MINUTES));
 		} catch (InterruptedException e) {
 			log.error("Failed to take() RecognitionService from queue with exception {}", e);
 			try {
-				return new CmuSphinxRecognitionService(
+				result = new CmuSphinxRecognitionService(
 						new PreAllocatingStreamSpeechRecognizer(provider.speechConfiguration));
 			} catch (IOException e1) {
 				log.error("Failed to create new recognizer with exception {}", e1);
 				// TODO (mdailey): Do this better.
-				return null;
+				result = null;
 			}
 		}
+		provider.enqueueNewRecognizerNonBlocking();
+		return result;
 	}
 	
 }
