@@ -12,7 +12,6 @@ import com.google.common.base.Stopwatch;
 import com.google.common.collect.ImmutableList;
 
 import edu.cmu.sphinx.api.SpeechResult;
-import edu.cmu.sphinx.api.StreamSpeechRecognizer;
 import edu.cmu.sphinx.result.WordResult;
 
 public class CmuSphinxRecognitionService implements RecognitionService {
@@ -23,7 +22,7 @@ public class CmuSphinxRecognitionService implements RecognitionService {
 	public List<WordResult> recognize(InputStream input) {
 		try {
 			Stopwatch createRecognizerStopwatch = Stopwatch.createStarted();
-			StreamSpeechRecognizer recognizer = new StreamSpeechRecognizer(CmuSphinxRecognitionUtils.getConfiguration());
+			PreAllocatingStreamSpeechRecognizer recognizer = new PreAllocatingStreamSpeechRecognizer(CmuSphinxRecognitionUtils.getConfiguration());
 			log.debug("Finished creating recognized. It took {} ms", createRecognizerStopwatch.elapsed(TimeUnit.MILLISECONDS));
 
 			Stopwatch recognizeStopwatch = Stopwatch.createStarted();
