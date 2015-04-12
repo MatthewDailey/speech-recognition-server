@@ -21,6 +21,13 @@ public class PreAllocatingStreamSpeechRecognizer extends AbstractSpeechRecognize
         recognizer.allocate();
         allocateTimer.log();
     }
+	
+	public SpeechResult recognize(InputStream stream) {
+		startRecognition(stream);
+		SpeechResult result = getResult();
+		stopRecognition();
+		return result;
+	}
 
     public void startRecognition(InputStream stream) {
     	LoggingTimer recognitionTimer = PerfUtils.getTimerStarted("PreallocatingRecognizer.startRecognition");
