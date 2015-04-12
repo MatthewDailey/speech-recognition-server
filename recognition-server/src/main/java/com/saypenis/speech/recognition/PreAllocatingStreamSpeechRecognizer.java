@@ -8,6 +8,7 @@ import com.saypenis.speech.perf.PerfUtils.LoggingTimer;
 
 import edu.cmu.sphinx.api.AbstractSpeechRecognizer;
 import edu.cmu.sphinx.api.Configuration;
+import edu.cmu.sphinx.api.SpeechResult;
 import edu.cmu.sphinx.util.TimeFrame;
 
 public class PreAllocatingStreamSpeechRecognizer extends AbstractSpeechRecognizer {
@@ -29,6 +30,14 @@ public class PreAllocatingStreamSpeechRecognizer extends AbstractSpeechRecognize
 
     private void startRecognition(InputStream stream, TimeFrame timeFrame) {
         context.setSpeechSource(stream, timeFrame);
+    }
+    
+    @Override
+    public SpeechResult getResult() {
+    	LoggingTimer getResultTimer = PerfUtils.getTimerStarted("PreallocatingRecognizer.getResult");
+    	SpeechResult result = super.getResult();
+    	getResultTimer.log();
+    	return result;
     }
 
     public void stopRecognition() {
