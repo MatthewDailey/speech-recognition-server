@@ -27,18 +27,18 @@ import com.saypenis.speech.recognition.RecognitionServiceProvider;
 import edu.cmu.sphinx.result.WordResult;
 
 @Path("recognize/s3")
-public class S3RecognizeResource {
+public class RecognizeS3Resource {
 
-	private final static Logger log = LoggerFactory.getLogger(S3RecognizeResource.class);
+	private final static Logger log = LoggerFactory.getLogger(RecognizeS3Resource.class);
 	
 	private final RecognitionService recognitionService;
 	private final AmazonS3 amazonS3;
 	
-	public S3RecognizeResource() {
+	public RecognizeS3Resource() {
 		this(RecognitionServiceProvider.get(), AwsSupplier.getS3());
 	}
 	
-	public S3RecognizeResource(RecognitionService recognitionService, AmazonS3 amazonS3) {
+	public RecognizeS3Resource(RecognitionService recognitionService, AmazonS3 amazonS3) {
 		this.recognitionService = recognitionService;
 		this.amazonS3 = amazonS3;
 	}
