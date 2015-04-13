@@ -16,10 +16,12 @@ import javax.xml.bind.JAXBException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.S3Object;
 import com.google.common.base.Stopwatch;
 import com.saypenis.speech.api.serialization.SerializationUtils;
 import com.saypenis.speech.aws.AwsSupplier;
+import com.saypenis.speech.recognition.RecognitionService;
 import com.saypenis.speech.recognition.RecognitionServiceProvider;
 
 import edu.cmu.sphinx.result.WordResult;
@@ -28,6 +30,18 @@ import edu.cmu.sphinx.result.WordResult;
 public class S3RecognizeResource {
 
 	private final static Logger log = LoggerFactory.getLogger(S3RecognizeResource.class);
+	
+	private final RecognitionService recognitionService;
+	private final AmazonS3 amazonS3;
+	
+	public S3RecognizeResource() {
+		this(RecognitionServiceProvider.get(), AwsSupplier.getS3());
+	}
+	
+	public S3RecognizeResource(RecognitionService recognitionService, AmazonS3 amazonS3) {
+		this.recognitionService = recognitionService;
+		this.amazonS3 = amazonS3;
+	}
 	
 	@GET 
 	@Produces("application/json")
@@ -59,10 +73,10 @@ public class S3RecognizeResource {
 		Stopwatch totalTimeStopwatch = Stopwatch.createStarted();
 		
 		Stopwatch s3FetchStopwatch = Stopwatch.createStarted();
-    	S3Object file = AwsSupplier.instance.s3().getObject(s3bucket, s3key);
+    	S3Object file = amazonS3.getObject(s3bucket, s3key);
     	log.debug("Finished fetching {} from s3. Took {} ms.", s3key, s3FetchStopwatch.elapsed(TimeUnit.MILLISECONDS));
     	
-    	List<WordResult> results = RecognitionServiceProvider.get().recognize(file.getObjectContent());
+    	List<WordResult> results = recognitionService.recognize(file.getObjectContent());
     	
     	log.debug("Completed request in {} ms", totalTimeStopwatch.elapsed(TimeUnit.MILLISECONDS));
 		return results;		

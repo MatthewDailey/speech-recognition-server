@@ -25,15 +25,23 @@ public final class AwsSupplier {
 	private static AWSCredentials getCreds() {
 		return new BasicAWSCredentials(accessKey, secretKey);
 	}
+	
+	public static AmazonS3 getS3() {
+		return instance.s3();
+	}
 
-	public synchronized AmazonS3 s3() {
+	private synchronized AmazonS3 s3() {
 		if (s3 == null) {
 			s3 = new AmazonS3Client(getCreds());
 		}
 		return s3;
 	}
+	
+	public static AmazonDynamoDB getDynamo() {
+		return instance.dynamo();
+	}
 
-	public synchronized AmazonDynamoDB dynamo() {
+	private synchronized AmazonDynamoDB dynamo() {
 		if (dynamo == null) {
 			dynamo = new AmazonDynamoDBClient(getCreds());
 		}
