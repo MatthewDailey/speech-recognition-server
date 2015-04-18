@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.util.UUID;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
@@ -16,6 +18,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.io.ByteStreams;
+import com.google.gson.Gson;
+import com.saypenis.speech.SayPenisConstants;
+import com.saypenis.speech.api.serialization.RoundResultBean;
 import com.saypenis.speech.perf.PerfUtils;
 import com.saypenis.speech.perf.PerfUtils.LoggingTimer;
 
@@ -41,7 +46,11 @@ public class RecognizeUploadResource {
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	public Response post(
 			@FormDataParam("file") InputStream fileInputStream,
-			@FormDataParam("file") FormDataContentDisposition fileDisposition) {
+			@FormDataParam("file") FormDataContentDisposition fileDisposition,
+			@DefaultValue(SayPenisConstants.DEFAULT_LAT) @FormDataParam("lat") long lat,
+			@DefaultValue(SayPenisConstants.DEFAULT_LON) @FormDataParam("lon") long lon,
+			@DefaultValue(SayPenisConstants.DEFAULT_USER_ID) @FormDataParam("user_id") String userId,
+			@FormDataParam("name") String name) {
 		String filename = fileDisposition.getFileName();
 		
 		log.debug("Received POST to /recognize/upload for file {}.", filename);
@@ -57,7 +66,7 @@ public class RecognizeUploadResource {
 		log.debug("File {} has size {} bytes", filename, fileContents.length);
 		
 		// 1. Generate time stamp.
-		long timestamp = System.currentTimeMillis();
+		long date = System.currentTimeMillis();
 		
 		// 2. Generate id.
 		UUID roundId = UUID.randomUUID();
@@ -70,8 +79,12 @@ public class RecognizeUploadResource {
 		// 6. Async store to S3. They'll play the file locally.
 		// 7. Async store row dynamo. They'll add to the score list locally.
 		
+		Gson gson = new Gson();
+		RoundResultBean roundResultBean = new RoundResultBean(roundId.toString(), date, lat, lon, name, 0, s3Url, userId, 
+				"no transcription");
+		
 		resourceTimer.log();
-		return Response.status(200).entity("Success").build();
+		return Response.status(200).entity(gson.toJson(roundResultBean)).build();
 	}
 	
 	private String generateS3Url() {
