@@ -1,6 +1,6 @@
 package com.saypenis.speech.api.serialization;
 
-public class RoundResultBean implements ResultBean {
+public class SuccessResultBean implements ResultBean {
 
 	public final String round_id;
 	public final long date;
@@ -12,7 +12,7 @@ public class RoundResultBean implements ResultBean {
 	public final String user_id;
 	public final String transcription;
 	
-	public RoundResultBean(String round_id, long date, long lat, long lon,
+	public SuccessResultBean(String round_id, long date, long lat, long lon,
 			String name, double score, String uri, String user_id,
 			String transcription) {
 		this.round_id = round_id;

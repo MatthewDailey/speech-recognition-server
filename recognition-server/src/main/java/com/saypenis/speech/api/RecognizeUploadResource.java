@@ -24,7 +24,9 @@ import com.google.common.base.Optional;
 import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
 import com.saypenis.speech.SayPenisConstants;
-import com.saypenis.speech.api.serialization.RoundResultBean;
+import com.saypenis.speech.api.serialization.ErrorResultBean;
+import com.saypenis.speech.api.serialization.ResultBean;
+import com.saypenis.speech.api.serialization.SuccessResultBean;
 import com.saypenis.speech.api.serialization.SerializationUtils;
 import com.saypenis.speech.perf.PerfUtils;
 import com.saypenis.speech.perf.PerfUtils.LoggingTimer;
@@ -55,7 +57,7 @@ public class RecognizeUploadResource {
 					final String filename = fileDisposition.getFileName();
 					final byte[] fileContents = ByteStreams.toByteArray(fileInputStream);
 					
-					RoundResultBean result = handlePost(fileContents, filename, lat, lon, 
+					ResultBean result = handlePost(fileContents, filename, lat, lon, 
 							userId, name);
 					Gson gson = new Gson();
 					asyncResponse.resume(Response.ok(gson.toJson(result)).build());
@@ -70,7 +72,7 @@ public class RecognizeUploadResource {
 		}).start();
 	}
 	
-	private RoundResultBean handlePost(			
+	private ResultBean handlePost(			
 			final byte[] fileContents,
 			final String filename,
 			final long lat,
@@ -93,11 +95,14 @@ public class RecognizeUploadResource {
 		
 		String transcription = SerializationUtils.transcribe(wordResults);
 		
-		RoundResultBean roundResultBean = new RoundResultBean(roundId.toString(), date, lat, lon, 
-				name, 0, s3Key, userId, transcription);
-		
-		resourceTimer.log();	
-		return roundResultBean;
+		resourceTimer.log();
+		if (score.isPresent()) {
+			return new SuccessResultBean(roundId.toString(), date, lat, lon, 
+				name, score.get(), s3Key, userId, transcription);
+		} else {
+			int resultCode = SayPenisScoringUtils.getErrorResultCode(wordResults);
+			return new ErrorResultBean(resultCode);
+		}
 	}
 	
 }
