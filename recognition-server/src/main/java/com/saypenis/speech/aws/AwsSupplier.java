@@ -4,7 +4,6 @@ import javax.inject.Singleton;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsync;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsyncClient;
 import com.amazonaws.services.s3.AmazonS3;
@@ -51,11 +50,11 @@ public final class AwsSupplier {
 		return s3;
 	}
 	
-	public static AmazonDynamoDB getDynamo() {
+	public static AmazonDynamoDBAsync getAsyncDynamo() {
 		return instance.dynamo();
 	}
 
-	private synchronized AmazonDynamoDB dynamo() {
+	private synchronized AmazonDynamoDBAsync dynamo() {
 		if (dynamo == null) {
 			dynamo = new AmazonDynamoDBAsyncClient(getCreds());
 		}
