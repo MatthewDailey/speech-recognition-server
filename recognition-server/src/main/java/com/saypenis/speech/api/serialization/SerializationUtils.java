@@ -2,8 +2,6 @@ package com.saypenis.speech.api.serialization;
 
 import java.util.List;
 
-import javax.xml.bind.JAXBException;
-
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 
@@ -14,7 +12,7 @@ public final class SerializationUtils {
 
 	private SerializationUtils() {}
 	
-	public static String serialize(List<WordResult> wordResults) throws JAXBException {
+	public static String serialize(List<WordResult> wordResults) {
 		List<WordResultBean> beans = Lists.newArrayList();
     	for (WordResult wr : wordResults) {
     		beans.add(new WordResultBean(wr.getWord().toString(),  
@@ -23,6 +21,14 @@ public final class SerializationUtils {
     	
     	Gson gson = new Gson();
     	return gson.toJson(beans);
+	}
+	
+	public static String transcribe(List<WordResult> wordResults) {
+		StringBuilder builder = new StringBuilder();
+		for (WordResult wordResult : wordResults) {
+			builder.append(wordResult.getWord().getSpelling()).append(" ");
+		}
+		return builder.toString();
 	}
 	
 }

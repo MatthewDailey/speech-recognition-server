@@ -25,6 +25,7 @@ import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
 import com.saypenis.speech.SayPenisConstants;
 import com.saypenis.speech.api.serialization.RoundResultBean;
+import com.saypenis.speech.api.serialization.SerializationUtils;
 import com.saypenis.speech.perf.PerfUtils;
 import com.saypenis.speech.perf.PerfUtils.LoggingTimer;
 import com.saypenis.speech.recognition.RecognitionServiceProvider;
@@ -90,8 +91,10 @@ public class RecognizeUploadResource {
 
 		Optional<Double> score = SayPenisScoringUtils.getScore(wordResults);
 		
+		String transcription = SerializationUtils.transcribe(wordResults);
+		
 		RoundResultBean roundResultBean = new RoundResultBean(roundId.toString(), date, lat, lon, 
-				name, 0, s3Key, userId, "no transcription");
+				name, 0, s3Key, userId, transcription);
 		
 		resourceTimer.log();	
 		return roundResultBean;
