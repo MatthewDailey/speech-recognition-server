@@ -28,6 +28,9 @@ import com.saypenis.speech.api.serialization.ErrorResultBean;
 import com.saypenis.speech.api.serialization.ResultBean;
 import com.saypenis.speech.api.serialization.SuccessResultBean;
 import com.saypenis.speech.api.serialization.SerializationUtils;
+import com.saypenis.speech.aws.AwsSupplier;
+import com.saypenis.speech.aws.SayPenisAwsUtils;
+import com.saypenis.speech.aws.SayPenisConfiguration;
 import com.saypenis.speech.perf.PerfUtils;
 import com.saypenis.speech.perf.PerfUtils.LoggingTimer;
 import com.saypenis.speech.recognition.RecognitionServiceProvider;
@@ -63,8 +66,10 @@ public class RecognizeUploadResource {
 					asyncResponse.resume(Response.ok(gson.toJson(result)).build());
 					
 					if (result.success) {
+						SuccessResultBean successBean = (SuccessResultBean) result;
 						// Store result 
-						// Store to s3						
+						SayPenisAwsUtils.storeToS3Async(successBean.s3bucket, 
+								successBean.s3key, fileContents, AwsSupplier.getTransferManager());
 					}
 				} catch (IOException e) {
 					log.error("Async  failed with IOException " + e);
@@ -99,8 +104,8 @@ public class RecognizeUploadResource {
 		
 		resourceTimer.log();
 		if (score.isPresent()) {
-			return new SuccessResultBean(roundId.toString(), date, lat, lon, 
-				name, score.get(), s3Key, userId, transcription);
+			return new SuccessResultBean(roundId.toString(), date, lat, lon, name, score.get(), 
+					SayPenisConfiguration.roundS3Bucket(), s3Key, userId, transcription);
 		} else {
 			int resultCode = SayPenisScoringUtils.getErrorResultCode(wordResults);
 			return new ErrorResultBean(resultCode);
