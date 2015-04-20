@@ -62,8 +62,10 @@ public class RecognizeUploadResource {
 					Gson gson = new Gson();
 					asyncResponse.resume(Response.ok(gson.toJson(result)).build());
 					
-					// Store result 
-					// Store to s3
+					if (result.success) {
+						// Store result 
+						// Store to s3						
+					}
 				} catch (IOException e) {
 					log.error("Async  failed with IOException " + e);
 					asyncResponse.resume("Fail with exception: " + e);

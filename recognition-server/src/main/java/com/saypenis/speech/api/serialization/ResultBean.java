@@ -1,5 +1,10 @@
 package com.saypenis.speech.api.serialization;
 
-public interface ResultBean {
-	// Place-holder interface to represent simple objects.
+public class ResultBean {
+	
+	public final boolean success;
+	
+	public ResultBean(boolean success) {
+		this.success = success;
+	}
 }
