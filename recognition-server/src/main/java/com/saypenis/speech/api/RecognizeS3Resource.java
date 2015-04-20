@@ -60,9 +60,6 @@ public class RecognizeS3Resource {
 				} catch (IOException e) {
 					log.error("Async s3recognize failed with IOException " + e);
 					asyncResponse.resume("Fail with exception: " + e);
-				} catch (JAXBException e) {
-					log.error("Async s3recognize failed with JAXBException " + e);
-					asyncResponse.resume("Fail with exception: " + e);
 				}
 			}
 		}).start();
