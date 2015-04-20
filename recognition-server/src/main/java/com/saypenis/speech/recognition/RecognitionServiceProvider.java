@@ -50,7 +50,7 @@ public final class RecognitionServiceProvider {
 		executor.execute(enqueueRecognizerRunnable);
 	}
 	
-	public static RecognitionService get() {
+	public static RecognitionService getCmuSphinxRecognizer() {
 		RecognitionService result;
 		try {
 			result = new CmuSphinxRecognitionService(provider.recognizerQueue.poll(1, TimeUnit.MINUTES));

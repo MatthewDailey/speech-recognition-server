@@ -35,7 +35,7 @@ public class RecognizeS3Resource {
 	private final AmazonS3 amazonS3;
 	
 	public RecognizeS3Resource() {
-		this(RecognitionServiceProvider.get(), AwsSupplier.getS3());
+		this(RecognitionServiceProvider.getCmuSphinxRecognizer(), AwsSupplier.getS3());
 	}
 	
 	public RecognizeS3Resource(RecognitionService recognitionService, AmazonS3 amazonS3) {

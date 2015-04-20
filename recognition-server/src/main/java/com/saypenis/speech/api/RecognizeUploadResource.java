@@ -1,14 +1,17 @@
 package com.saypenis.speech.api;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.UUID;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.container.AsyncResponse;
+import javax.ws.rs.container.Suspended;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -17,84 +20,81 @@ import org.glassfish.jersey.media.multipart.FormDataParam;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Optional;
 import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
 import com.saypenis.speech.SayPenisConstants;
 import com.saypenis.speech.api.serialization.RoundResultBean;
 import com.saypenis.speech.perf.PerfUtils;
 import com.saypenis.speech.perf.PerfUtils.LoggingTimer;
+import com.saypenis.speech.recognition.RecognitionServiceProvider;
+import com.saypenis.speech.scoring.SayPenisScoringUtils;
+
+import edu.cmu.sphinx.result.WordResult;
 
 @Path("/recognize/upload")
 public class RecognizeUploadResource {
 	
 	private static final Logger log = LoggerFactory.getLogger(RecognizeUploadResource.class);
 
-	/*
-	 * Need args: 
-	 * 1. Data stream to do recognition.
-	 * 2. Player name.
-	 * 3. Player id.
-	 * 4. lat / lon.
-	 * 
-	 * Return:
-	 * 1. score
-	 * 2. s3 url
-	 * 3. timestamp
-	 * 4. round id
-	 */
 	@POST
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
-	public Response post(
-			@FormDataParam("file") InputStream fileInputStream,
-			@FormDataParam("file") FormDataContentDisposition fileDisposition,
-			@DefaultValue(SayPenisConstants.DEFAULT_LAT) @FormDataParam("lat") long lat,
-			@DefaultValue(SayPenisConstants.DEFAULT_LON) @FormDataParam("lon") long lon,
-			@DefaultValue(SayPenisConstants.DEFAULT_USER_ID) @FormDataParam("user_id") String userId,
-			@FormDataParam("name") String name) {
-		String filename = fileDisposition.getFileName();
-		
+	public void post(
+			@Suspended final AsyncResponse asyncResponse,
+			@FormDataParam("file") final InputStream fileInputStream,
+			@FormDataParam("file") final FormDataContentDisposition fileDisposition,
+			@DefaultValue(SayPenisConstants.DEFAULT_LAT) @FormDataParam("lat") final long lat,
+			@DefaultValue(SayPenisConstants.DEFAULT_LON) @FormDataParam("lon") final long lon,
+			@DefaultValue(SayPenisConstants.DEFAULT_USER_ID) @FormDataParam("user_id") final String userId,
+			@FormDataParam("name") final String name) {
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					final String filename = fileDisposition.getFileName();
+					final byte[] fileContents = ByteStreams.toByteArray(fileInputStream);
+					
+					RoundResultBean result = handlePost(fileContents, filename, lat, lon, 
+							userId, name);
+					Gson gson = new Gson();
+					asyncResponse.resume(Response.ok(gson.toJson(result)).build());
+					
+					// Store result 
+					// Store to s3
+				} catch (IOException e) {
+					log.error("Async  failed with IOException " + e);
+					asyncResponse.resume("Fail with exception: " + e);
+				}
+			}
+		}).start();
+	}
+	
+	private RoundResultBean handlePost(			
+			final byte[] fileContents,
+			final String filename,
+			final long lat,
+			final long lon,
+			final String userId,
+			final String name) throws IOException {
 		log.debug("Received POST to /recognize/upload for file {}.", filename);
-		LoggingTimer resourceTimer = PerfUtils.getTimerStarted("/recognize/upload file=" + filename);
-		
-		byte[] fileContents = new byte[0];
-		try {
-			fileContents = ByteStreams.toByteArray(fileInputStream);
-		} catch (IOException e) {
-			log.error("Failed to read fileinput stream with exception {}", e);
-			return Response.status(200).entity("Failed to read file stream.").build();
-		}
 		log.debug("File {} has size {} bytes", filename, fileContents.length);
-		
-		// 1. Generate time stamp.
+		LoggingTimer resourceTimer = PerfUtils.getTimerStarted("/recognize/upload file=" + filename);
+
+		// Generate timestamp, roundId, s3key
 		long date = System.currentTimeMillis();
-		
-		// 2. Generate id.
 		UUID roundId = UUID.randomUUID();
+		String s3Key = "round_" + roundId.toString();
 		
-		// 3. Genearate s3 url (from ids).
-		String s3Url = generateS3Url();
+		List<WordResult> wordResults = RecognitionServiceProvider.getCmuSphinxRecognizer()
+				.recognize(new ByteArrayInputStream(fileContents));
+
+		Optional<Double> score = SayPenisScoringUtils.getScore(wordResults);
 		
-		// 4. Do voice recognition and scoring.
-		// 5. Send back response.
-		// 6. Async store to S3. They'll play the file locally.
-		// 7. Async store row dynamo. They'll add to the score list locally.
+		RoundResultBean roundResultBean = new RoundResultBean(roundId.toString(), date, lat, lon, 
+				name, 0, s3Key, userId, "no transcription");
 		
-		Gson gson = new Gson();
-		RoundResultBean roundResultBean = new RoundResultBean(roundId.toString(), date, lat, lon, name, 0, s3Url, userId, 
-				"no transcription");
-		
-		resourceTimer.log();
-		return Response.status(200).entity(gson.toJson(roundResultBean)).build();
+		resourceTimer.log();	
+		return roundResultBean;
 	}
 	
-	private String generateS3Url() {
-		// TODO (mdailey): Copy from android.
-		// SayPenisAwsService -> logic for SayPenis tables and s3 paths.
-		return "null";
-	}
-	
-	private double scoreAudio(byte[] fileContents) {
-		// TODO (mdailey): ScoringService -> gitignored for secrecy.
-		return 0;
-	}
 }

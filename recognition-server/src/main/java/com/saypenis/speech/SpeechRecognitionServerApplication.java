@@ -7,7 +7,7 @@ public class SpeechRecognitionServerApplication extends ResourceConfig {
 
 	public SpeechRecognitionServerApplication() {
 		packages("com.saypenis.speech");
-		register(MultiPartFeature.class);
+		register(MultiPartFeature.class); 
 	}
 
 }
