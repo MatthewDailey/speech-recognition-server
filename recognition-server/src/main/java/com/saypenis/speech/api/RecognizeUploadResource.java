@@ -69,7 +69,7 @@ public class RecognizeUploadResource {
 					if (result.success) {
 						SuccessResultBean successBean = (SuccessResultBean) result;
 						SayPenisAwsUtils.storeToDynamoAsync(SayPenisConfiguration.roundTable(), 
-								successBean, AwsSupplier.getAsyncDynamo());
+								successBean, AwsSupplier.getDynamo());
 						SayPenisAwsUtils.storeToS3Async(successBean.s3bucket, 
 								successBean.s3key, fileContents, AwsSupplier.getTransferManager());
 					}

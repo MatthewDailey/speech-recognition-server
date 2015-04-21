@@ -3,7 +3,7 @@ package com.saypenis.speech.aws;
 import java.io.ByteArrayInputStream;
 import java.util.Map;
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBAsync;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.transfer.TransferManager;
@@ -24,11 +24,11 @@ public final class SayPenisAwsUtils {
 	}
 	
 	public static void storeToDynamoAsync(String tableName, SuccessResultBean resultBean, 
-			AmazonDynamoDBAsync dynamo) {
+			AmazonDynamoDB dynamo) {
 		dynamo.putItem(tableName, successBeanToAttributeValues(resultBean));
 	}
 	
-	private static Map<String, AttributeValue> successBeanToAttributeValues(SuccessResultBean resultBean) {
+	public static Map<String, AttributeValue> successBeanToAttributeValues(SuccessResultBean resultBean) {
 		ImmutableMap.Builder<String, AttributeValue> columnToAttributeValue = ImmutableMap.builder();
 		
 		String uri = getS3Uri(resultBean.s3bucket, resultBean.s3key);
