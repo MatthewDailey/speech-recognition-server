@@ -32,9 +32,9 @@ public final class SayPenisConfiguration {
 		}
 	}
 
-	private static final String ROUND_S3_BUCKET_PROD = "say-penis-clean/prod";
-	private static final String ROUND_S3_BUCKET_STAGING = "say-penis-clean/staging";
-	private static final String ROUND_S3_BUCKET_TEST = "say-penis-clean/test";
+	private static final String ROUND_S3_BUCKET_PROD = "say-penis-clean-recordings/prod";
+	private static final String ROUND_S3_BUCKET_STAGING = "say-penis-clean-recordings/staging";
+	private static final String ROUND_S3_BUCKET_TEST = "say-penis-clean-recordings/test";
 	
 	public static String roundS3Bucket() {
 		switch(getDeploymentEnvironment()) {

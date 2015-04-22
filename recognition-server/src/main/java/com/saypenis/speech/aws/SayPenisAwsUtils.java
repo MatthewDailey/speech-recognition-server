@@ -1,26 +1,38 @@
 package com.saypenis.speech.aws;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.transfer.TransferManager;
+import com.amazonaws.services.s3.transfer.Upload;
 import com.google.common.collect.ImmutableMap;
 import com.saypenis.speech.api.serialization.SuccessResultBean;
 
 public final class SayPenisAwsUtils {
 
+	private static final Logger log = LoggerFactory.getLogger(SayPenisAwsUtils.class);
+	
 	private SayPenisAwsUtils() {}
 	
 	private static final int VALID = 1;
 	
-	public static void storeToS3Async(String s3bucket, String s3Key, byte[] fileContents, 
+	public static Upload storeToS3Async(String s3bucket, String s3Key, byte[] fileContents, 
 			TransferManager transferManager) {
+		log.debug("Storing to S3 bucket={} key={}", s3bucket, s3Key);
+		AwsSupplier.getS3().putObject(s3bucket, s3Key, new File("pathname"));
+		
 		ObjectMetadata objectMetadata = new ObjectMetadata();
+//		objectMetadata.setContentMD5(Hashing.md5().hashBytes(Base64.base64Encode(fileContents)).toString());
 		objectMetadata.setContentLength(fileContents.length);
-		transferManager.upload(s3bucket, s3Key, new ByteArrayInputStream(fileContents), objectMetadata);
+		objectMetadata.setContentType("text/plain");
+		return transferManager.upload(s3bucket, s3Key, new ByteArrayInputStream(fileContents), objectMetadata);
 	}
 	
 	public static void storeToDynamoAsync(String tableName, SuccessResultBean resultBean, 

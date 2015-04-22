@@ -34,7 +34,7 @@ public final class AwsSupplier {
 
 	private synchronized TransferManager transferManager() {
 		if (transferManager == null) {
-			transferManager = new TransferManager(getCreds());
+			transferManager = new TransferManager(s3());
 		}
 		return transferManager;
 	}
@@ -46,6 +46,7 @@ public final class AwsSupplier {
 	private synchronized AmazonS3 s3() {
 		if (s3 == null) {
 			s3 = new AmazonS3Client(getCreds());
+//			s3.setEndpoint("https://us-west-1.s3.amazonaws.com");
 		}
 		return s3;
 	}
