@@ -1,7 +1,6 @@
 package com.saypenis.speech.aws;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -26,12 +25,9 @@ public final class SayPenisAwsUtils {
 	public static Upload storeToS3Async(String s3bucket, String s3Key, byte[] fileContents, 
 			TransferManager transferManager) {
 		log.debug("Storing to S3 bucket={} key={}", s3bucket, s3Key);
-		AwsSupplier.getS3().putObject(s3bucket, s3Key, new File("pathname"));
 		
 		ObjectMetadata objectMetadata = new ObjectMetadata();
-//		objectMetadata.setContentMD5(Hashing.md5().hashBytes(Base64.base64Encode(fileContents)).toString());
 		objectMetadata.setContentLength(fileContents.length);
-		objectMetadata.setContentType("text/plain");
 		return transferManager.upload(s3bucket, s3Key, new ByteArrayInputStream(fileContents), objectMetadata);
 	}
 	
