@@ -24,6 +24,7 @@ import com.google.common.base.Optional;
 import com.google.common.io.ByteStreams;
 import com.google.gson.Gson;
 import com.saypenis.speech.SayPenisConstants;
+import com.saypenis.speech.api.StatusResource.EndpointStatus;
 import com.saypenis.speech.api.serialization.ErrorResultBean;
 import com.saypenis.speech.api.serialization.ResultBean;
 import com.saypenis.speech.api.serialization.SuccessResultBean;
@@ -53,6 +54,15 @@ public class RecognizeUploadResource {
 			@DefaultValue(SayPenisConstants.DEFAULT_LON) @FormDataParam("lon") final long lon,
 			@DefaultValue(SayPenisConstants.DEFAULT_USER_ID) @FormDataParam("user_id") final String userId,
 			@FormDataParam("name") final String name) {
+		final Gson gson = new Gson();
+		
+		EndpointStatus status = StatusResource.getStatus();
+		if (status == EndpointStatus.DOWN) {
+			ErrorResultBean errorResultBean = new ErrorResultBean(SayPenisConstants.ERROR_SERVICE_DOWN);
+			asyncResponse.resume(Response.ok(gson.toJson(errorResultBean)).build());
+			return;
+		}
+		
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -62,7 +72,7 @@ public class RecognizeUploadResource {
 					
 					ResultBean result = handlePost(fileContents, filename, lat, lon, 
 							userId, name);
-					Gson gson = new Gson();
+					
 					asyncResponse.resume(Response.ok(gson.toJson(result)).build());
 					
 					if (result.success) {

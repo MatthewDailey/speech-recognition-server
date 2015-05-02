@@ -11,9 +11,32 @@ import edu.cmu.sphinx.util.LogMath;
 public final class SayPenisScoringUtils {
 
 	private SayPenisScoringUtils() {}
+
+	private interface ScoreDampingFunction {
+		double damp(double score);
+	}
+	
+	private static class PowerDampingFunction implements ScoreDampingFunction {
+		@Override
+		public double damp(double score) {
+			return Math.pow(score, 16);
+		}
+	}
+	
+	private static class LinearDampingFunction implements ScoreDampingFunction {
+		@Override
+		public double damp(double score) {
+			return score - 0.001;
+		}
+	}
 	
 	private static double scoreFromWordResult(WordResult wordResult) {
-		return LogMath.getLogMath().logToLinear((float) wordResult.getConfidence());
+		ScoreDampingFunction linearDampingFunction = new LinearDampingFunction();
+		ScoreDampingFunction powerDampingFunction = new PowerDampingFunction();
+		return powerDampingFunction.damp(
+				linearDampingFunction.damp(
+				LogMath.getLogMath().logToLinear(
+				(float) wordResult.getConfidence())));
 	}
 	
 	/*
