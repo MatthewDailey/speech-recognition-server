@@ -1,4 +1,4 @@
-package com.saypenis.speech.aws;
+package com.saypenis.speech.aws.test;
 
 import static org.junit.Assert.*;
 
@@ -17,6 +17,9 @@ import com.amazonaws.services.dynamodbv2.model.GetItemResult;
 import com.amazonaws.services.s3.transfer.Upload;
 import com.google.common.collect.Maps;
 import com.saypenis.speech.api.serialization.SuccessResultBean;
+import com.saypenis.speech.aws.AwsSupplier;
+import com.saypenis.speech.aws.SayPenisAwsUtils;
+import com.saypenis.speech.aws.SayPenisConfiguration;
 
 public class SayPenisAwsUtilsTest {
 

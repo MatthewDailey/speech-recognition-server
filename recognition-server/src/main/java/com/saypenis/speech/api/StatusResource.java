@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 @Path("status")
 public class StatusResource {
 
-	static final String ENDPOINT_STATUS = "ENDPOINT_STATUS";
+	public static final String ENDPOINT_STATUS = "ENDPOINT_STATUS";
 	
 	public enum EndpointStatus {
 		OFFLINE, LOW_AVAILABILITY, ONLINE
