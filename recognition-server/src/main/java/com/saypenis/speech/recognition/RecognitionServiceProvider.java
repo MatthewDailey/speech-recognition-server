@@ -23,7 +23,7 @@ public final class RecognitionServiceProvider {
 	
 	private RecognitionServiceProvider() {
 		recognizerQueue = new LinkedBlockingDeque<PreAllocatingStreamSpeechRecognizer>();
-		speechConfiguration = CmuSphinxRecognitionUtils.getConfiguration();
+		speechConfiguration = CmuSphinxRecognitionUtils.getAdaptedConfiguration();
 		executor = Executors.newSingleThreadExecutor();
 		enqueueNewRecognizerNonBlocking();
 	}

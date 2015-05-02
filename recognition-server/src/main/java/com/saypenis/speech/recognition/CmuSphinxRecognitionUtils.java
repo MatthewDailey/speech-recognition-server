@@ -13,4 +13,12 @@ public final class CmuSphinxRecognitionUtils {
     	configuration.setLanguageModelPath("resource:/edu/cmu/sphinx/models/en-us/en-us.lm.dmp");
     	return configuration;
 	}
+	
+	public static Configuration getAdaptedConfiguration() {
+    	Configuration configuration = new Configuration();
+    	configuration.setAcousticModelPath("resource:/com/saypenis/speech/resources/en-us");
+    	configuration.setDictionaryPath("resource:/com/saypenis/speech/resources/cmudict-en-us.dict");
+    	configuration.setLanguageModelPath("resource:/com/saypenis/speech/resources/en-us.lm.dmp");
+    	return configuration;
+	}
 }

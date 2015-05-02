@@ -43,7 +43,6 @@ public class RecognizeUploadResource {
 	
 	private static final Logger log = LoggerFactory.getLogger(RecognizeUploadResource.class);
 
-	// TODO (mdailey): Factor out file name. Not useful. Use round id and make all logging associated.
 	@POST
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	public void post(
@@ -99,7 +98,8 @@ public class RecognizeUploadResource {
 		
 		List<WordResult> wordResults = RecognitionServiceProvider.getCmuSphinxRecognizer()
 				.recognize(new ByteArrayInputStream(fileContents));
-
+		log.debug("Word results for file {} : {}", filename, wordResults);
+		
 		Optional<Double> score = SayPenisScoringUtils.getScore(wordResults);
 		
 		String transcription = SerializationUtils.transcribe(wordResults);
