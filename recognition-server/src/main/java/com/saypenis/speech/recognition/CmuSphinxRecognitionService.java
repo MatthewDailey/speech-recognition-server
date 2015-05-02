@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Stopwatch;
 
-import edu.cmu.sphinx.api.SpeechResult;
 import edu.cmu.sphinx.result.WordResult;
 
 /**
@@ -33,10 +32,10 @@ public class CmuSphinxRecognitionService implements RecognitionService {
 	@Override
 	public List<WordResult> recognize(InputStream input) {
 		Stopwatch recognizeStopwatch = Stopwatch.createStarted();
-		SpeechResult result = recognizer.recognize(input);    	
+		List<WordResult> result = recognizer.recognize(input);    	
 		log.debug("Finished recognition. Took {} ms.", recognizeStopwatch.elapsed(TimeUnit.MILLISECONDS));
 
-		return result.getWords();
+		return result;
 	}
 
 }

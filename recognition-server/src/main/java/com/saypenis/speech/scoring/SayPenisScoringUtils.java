@@ -46,7 +46,7 @@ public final class SayPenisScoringUtils {
 	 * penis. Perhaps a strategy pattern :O
 	 */
 	public static Optional<Double> getScore(List<WordResult> wordResults) {
-		if (getPenisCount(wordResults) == 1) {
+		if (getPenisCount(wordResults) == 1 && containsOnlyPenis(wordResults)) {
 			return getScoreForFirstPenis(wordResults);
 		} else {
 			return Optional.absent();
@@ -66,11 +66,23 @@ public final class SayPenisScoringUtils {
 		int penisCount = getPenisCount(wordResults);
 		if (penisCount == 0) {
 			return SayPenisConstants.ERROR_NO_PENIS_DETECTED;
+		} else if (penisCount == 1 ) {
+			return SayPenisConstants.ERROR_NON_PENIS_WORDS;
 		} else if (penisCount > 1) {
 			return SayPenisConstants.ERROR_TOO_MANY_PENISES;
 		} else {
 			return SayPenisConstants.ERROR_INTERNAL_ERROR;
 		}
+	}
+
+	private static boolean containsOnlyPenis(List<WordResult> wordResults) {
+		for (WordResult wordResult : wordResults) {
+			String word = wordResult.getWord().getSpelling();
+			if (!(word.startsWith("<") || word.startsWith("[")) && !word.equalsIgnoreCase("penis")) {
+				return false;
+			}
+		}
+		return true;
 	}
 	
 	private static int getPenisCount(List<WordResult> wordResults) {
@@ -78,7 +90,7 @@ public final class SayPenisScoringUtils {
 		for (WordResult wordResult : wordResults) {
 			if (wordResult.getWord().getSpelling().equalsIgnoreCase("penis")) {
 				penisesCount++;
-			}
+			} 
 		}
 		return penisesCount;
 	}

@@ -2,13 +2,16 @@ package com.saypenis.speech.recognition;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 
+import com.google.common.collect.Lists;
 import com.saypenis.speech.perf.PerfUtils;
 import com.saypenis.speech.perf.PerfUtils.LoggingTimer;
 
 import edu.cmu.sphinx.api.AbstractSpeechRecognizer;
 import edu.cmu.sphinx.api.Configuration;
 import edu.cmu.sphinx.api.SpeechResult;
+import edu.cmu.sphinx.result.WordResult;
 import edu.cmu.sphinx.util.TimeFrame;
 
 public class PreAllocatingStreamSpeechRecognizer extends AbstractSpeechRecognizer {
@@ -22,11 +25,15 @@ public class PreAllocatingStreamSpeechRecognizer extends AbstractSpeechRecognize
         allocateTimer.log();
     }
 	
-	public SpeechResult recognize(InputStream stream) {
+	public List<WordResult> recognize(InputStream stream) {
 		startRecognition(stream);
-		SpeechResult result = getResult();
+		SpeechResult result;
+		List<WordResult> wordResults = Lists.newLinkedList();
+		while ((result = getResult()) != null) {
+			wordResults.addAll(result.getWords());
+		}
 		stopRecognition();
-		return result;
+		return wordResults;
 	}
 
     public void startRecognition(InputStream stream) {
