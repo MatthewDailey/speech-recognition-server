@@ -57,7 +57,7 @@ public class RecognizeUploadResource {
 		final Gson gson = new Gson();
 		
 		EndpointStatus status = StatusResource.getStatus();
-		if (status == EndpointStatus.DOWN) {
+		if (status == EndpointStatus.OFFLINE) {
 			ErrorResultBean errorResultBean = new ErrorResultBean(
 					SayPenisConstants.ERROR_SERVICE_DOWN);
 			asyncResponse.resume(Response.ok(gson.toJson(errorResultBean)).build());
