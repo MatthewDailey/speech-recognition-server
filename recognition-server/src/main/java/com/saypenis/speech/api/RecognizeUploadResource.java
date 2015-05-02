@@ -58,7 +58,8 @@ public class RecognizeUploadResource {
 		
 		EndpointStatus status = StatusResource.getStatus();
 		if (status == EndpointStatus.DOWN) {
-			ErrorResultBean errorResultBean = new ErrorResultBean(SayPenisConstants.ERROR_SERVICE_DOWN);
+			ErrorResultBean errorResultBean = new ErrorResultBean(
+					SayPenisConstants.ERROR_SERVICE_DOWN);
 			asyncResponse.resume(Response.ok(gson.toJson(errorResultBean)).build());
 			return;
 		}
@@ -83,8 +84,10 @@ public class RecognizeUploadResource {
 								successBean.s3key, fileContents, AwsSupplier.getTransferManager());
 					}
 				} catch (IOException e) {
-					log.error("Async  failed with IOException " + e);
-					asyncResponse.resume("Fail with exception: " + e);
+					log.error("Async failed with IOException " + e);
+					ErrorResultBean errorResultBean = new ErrorResultBean(
+							SayPenisConstants.ERROR_INTERNAL_ERROR);
+					asyncResponse.resume(Response.ok(gson.toJson(errorResultBean)).build());
 				}
 			}
 		}).start();
