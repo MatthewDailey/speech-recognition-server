@@ -68,10 +68,9 @@ public class RecognizeUploadResource {
 			@Override
 			public void run() {
 				try {
-					final String filename = fileDisposition.getFileName();
 					final byte[] fileContents = ByteStreams.toByteArray(fileInputStream);
 					
-					ResultBean result = handlePost(fileContents, filename, lat, lon, 
+					ResultBean result = handlePost(fileContents, lat, lon, 
 							userId, name);
 					
 					asyncResponse.resume(Response.ok(gson.toJson(result)).build());
@@ -83,8 +82,8 @@ public class RecognizeUploadResource {
 						SayPenisAwsUtils.storeToS3Async(successBean.s3bucket, 
 								successBean.s3key, fileContents, AwsSupplier.getTransferManager());
 					}
-				} catch (IOException e) {
-					log.error("Async failed with IOException " + e);
+				} catch (Exception e) {
+					log.error("Async failed with Exception {}", e, e);
 					ErrorResultBean errorResultBean = new ErrorResultBean(
 							SayPenisConstants.ERROR_INTERNAL_ERROR);
 					asyncResponse.resume(Response.ok(gson.toJson(errorResultBean)).build());
@@ -95,23 +94,22 @@ public class RecognizeUploadResource {
 	
 	private ResultBean handlePost(			
 			final byte[] fileContents,
-			final String filename,
 			final long lat,
 			final long lon,
 			final String userId,
 			final String name) throws IOException {
-		log.debug("Received POST to /recognize/upload for file {}.", filename);
-		log.debug("File {} has size {} bytes", filename, fileContents.length);
-		LoggingTimer resourceTimer = PerfUtils.getTimerStarted("/recognize/upload file=" + filename);
-
 		// Generate timestamp, roundId, s3key
 		long date = System.currentTimeMillis();
 		UUID roundId = UUID.randomUUID();
 		String s3Key = "round_" + roundId.toString();
 		
+		log.debug("Received POST to /recognize/upload for round {}.", roundId);
+		log.debug("Round {} has size {} bytes", roundId, fileContents.length);
+		LoggingTimer resourceTimer = PerfUtils.getTimerStarted("/recognize/upload round=" + roundId);
+		
 		List<WordResult> wordResults = RecognitionServiceProvider.getCmuSphinxRecognizer()
 				.recognize(new ByteArrayInputStream(fileContents));
-		log.debug("Word results for file {} : {}", filename, wordResults);
+		log.debug("Word results for round {} : {}", roundId, wordResults);
 		
 		Optional<Double> score = SayPenisScoringUtils.getScore(wordResults);
 		
