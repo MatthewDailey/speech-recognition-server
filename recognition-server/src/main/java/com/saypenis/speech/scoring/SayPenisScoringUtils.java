@@ -39,12 +39,6 @@ public final class SayPenisScoringUtils {
 				(float) wordResult.getConfidence())));
 	}
 	
-	/*
-	 * Returns the score for any sentance which includes the word "penis" exactly once.
-	 * 
-	 * TODO (mdailey): This should be improved to score either for only 1 penis or to take the best
-	 * penis. Perhaps a strategy pattern :O
-	 */
 	public static Optional<Double> getScore(List<WordResult> wordResults) {
 		if (getPenisCount(wordResults) == 1 && containsOnlyPenis(wordResults)) {
 			return getScoreForFirstPenis(wordResults);

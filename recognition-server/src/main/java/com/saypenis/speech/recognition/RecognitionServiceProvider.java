@@ -18,6 +18,8 @@ import edu.cmu.sphinx.api.Configuration;
 public final class RecognitionServiceProvider {
 
 	private final static Logger log = LoggerFactory.getLogger(RecognitionServiceProvider.class);
+	
+	private final static int MAX_ATTEMPTS_CREATE_RECOGNIZER = 10;
 
 	private static RecognitionServiceProvider provider = new RecognitionServiceProvider();
 	
@@ -35,12 +37,12 @@ public final class RecognitionServiceProvider {
 	private final Runnable enqueueRecognizerRunnable = new Runnable() {
 		@Override
 		public void run() {
-			while(true) {
+			for (int attemptNum = 0; attemptNum < MAX_ATTEMPTS_CREATE_RECOGNIZER; attemptNum++) {
 				try {
 					recognizerQueue.put(new PreAllocatingStreamSpeechRecognizer(speechConfiguration));
-					break;
+					return;
 				} catch (Exception e) {
-					log.error("Failed to enqueue new recognizer with exception {}", e);
+					log.error("Failed to enqueue new recognizer with exception {}", e, e);
 				}
 			}
 		}
@@ -54,19 +56,23 @@ public final class RecognitionServiceProvider {
 		RecognitionService result;
 		try {
 			result = new CmuSphinxRecognitionService(provider.recognizerQueue.poll(1, TimeUnit.MINUTES));
-		} catch (InterruptedException e) {
-			log.error("Failed to take() RecognitionService from queue with exception {}", e);
-			try {
-				result = new CmuSphinxRecognitionService(
-						new PreAllocatingStreamSpeechRecognizer(provider.speechConfiguration));
-			} catch (IOException e1) {
-				log.error("Failed to create new recognizer with exception {}", e1);
-				// TODO (mdailey): Do this better.
-				result = null;
-			}
+		} catch (InterruptedException interruptedException) {
+			log.error("Failed to poll() RecognitionService from queue with exception {}", 
+					interruptedException, interruptedException);
+			result = buildRecognitionServiceSafe();
 		}
 		provider.enqueueNewRecognizerNonBlocking();
 		return result;
+	}
+	
+	private static RecognitionService buildRecognitionServiceSafe() {
+		try {
+			return new CmuSphinxRecognitionService(
+					new PreAllocatingStreamSpeechRecognizer(provider.speechConfiguration));
+		} catch (IOException ioException) {
+			log.error("Failed to create new recognizer with exception {}", ioException, ioException);
+			return new NoopRecognitionService();
+		}
 	}
 	
 }
