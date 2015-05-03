@@ -57,7 +57,7 @@ public class RecognizeUploadResourceTest extends JerseyTest {
 		ErrorResultBean resultBean = gson.fromJson(
 				makeApiCall("src/test/java/com/saypenis/speech/api/test/resources/clean_test_penis.wav"), 
 				ErrorResultBean.class);
-		assertEquals(SayPenisConstants.ERROR_SERVICE_DOWN, resultBean.resultCode);
+		assertEquals(SayPenisConstants.ERROR_SERVICE_OFFLINE, resultBean.resultCode);
 	}
 	
 	@Test

@@ -47,66 +47,76 @@ public class RecognizeUploadResource {
 	@POST
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
 	public void post(
-			@Suspended final AsyncResponse asyncResponse,
-			@FormDataParam("file") final InputStream fileInputStream,
-			@FormDataParam("file") final FormDataContentDisposition fileDisposition,
-			@DefaultValue(SayPenisConstants.DEFAULT_LAT) @FormDataParam("lat") final long lat,
-			@DefaultValue(SayPenisConstants.DEFAULT_LON) @FormDataParam("lon") final long lon,
-			@DefaultValue(SayPenisConstants.DEFAULT_USER_ID) @FormDataParam("user_id") final String userId,
-			@FormDataParam("name") final String name) {
-		final Gson gson = new Gson();
+			@Suspended AsyncResponse asyncResponse,
+			@FormDataParam("file") InputStream fileInputStream,
+			@FormDataParam("file") FormDataContentDisposition fileDisposition,
+			@DefaultValue(SayPenisConstants.DEFAULT_LAT) @FormDataParam("lat") long lat,
+			@DefaultValue(SayPenisConstants.DEFAULT_LON) @FormDataParam("lon") long lon,
+			@DefaultValue(SayPenisConstants.DEFAULT_USER_ID) @FormDataParam("user_id") String userId,
+			@FormDataParam("name") String name) {
 		
-		EndpointStatus status = StatusResource.getStatus();
-		if (status == EndpointStatus.OFFLINE) {
-			ErrorResultBean errorResultBean = new ErrorResultBean(
-					SayPenisConstants.ERROR_SERVICE_DOWN);
-			asyncResponse.resume(Response.ok(gson.toJson(errorResultBean)).build());
-			return;
+		if (StatusResource.getStatus() == EndpointStatus.OFFLINE) {
+			respondErrorOffline(asyncResponse);
+		} else {
+			launchAsyncResponseThread(asyncResponse, fileInputStream, fileDisposition, lat, lon, userId, name);
 		}
-		
+	}
+	
+	private void launchAsyncResponseThread(final AsyncResponse asyncResponse,
+			final InputStream fileInputStream, final FormDataContentDisposition fileDisposition,
+			final long lat, final long lon, final String userId, final String name) {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
+				Gson gson = new Gson();
 				try {
 					final byte[] fileContents = ByteStreams.toByteArray(fileInputStream);
 					
-					ResultBean result = handlePost(fileContents, lat, lon, 
+					ResultBean result = createRoundMetadataAndScoreAudio(fileContents, lat, lon, 
 							userId, name);
 					
 					asyncResponse.resume(Response.ok(gson.toJson(result)).build());
 					
-					handleResult(result, fileContents);
+					if (result.success) {
+						writeResultToDynamoAndS3(result, fileContents);
+					}
 				} catch (Exception e) {
-					log.error("Async /recognize/upload failed with Exception {}", e, e);
-					ErrorResultBean errorResultBean = new ErrorResultBean(
-							SayPenisConstants.ERROR_INTERNAL_ERROR);
-					asyncResponse.resume(Response.ok(gson.toJson(errorResultBean)).build());
+					responseInternalError(asyncResponse, e);
 				}
 			}
 		}).start();
 	}
 	
-	private void handleResult(ResultBean result, byte[] fileContents) {
-		if (result.success) {
-			SuccessResultBean successBean = (SuccessResultBean) result;
-			try {
-				SayPenisAwsUtils.storeToDynamoAsync(SayPenisConfiguration.roundTable(), 
-						successBean, AwsSupplier.getDynamo());
-				SayPenisAwsUtils.storeToS3Async(successBean.s3bucket, 
-						successBean.s3key, fileContents, AwsSupplier.getTransferManager());
-			} catch (Exception e) {
-				log.warn("Failed to store result to AWS for result={} with exception={}", result, e, e);
-			}
+	private void respondErrorOffline(AsyncResponse asyncResponse) {
+		log.warn("Request to /recognize/upload rejected due to status={}", EndpointStatus.OFFLINE);
+		Gson gson = new Gson();
+		ErrorResultBean errorResultBean = new ErrorResultBean(
+				SayPenisConstants.ERROR_SERVICE_OFFLINE);
+		asyncResponse.resume(Response.ok(gson.toJson(errorResultBean)).build());
+	}
+	
+	private void responseInternalError(AsyncResponse asyncResponse, Exception e) {
+		log.error("Async /recognize/upload failed with Exception {}", e, e);
+		Gson gson = new Gson();
+		ErrorResultBean errorResultBean = new ErrorResultBean(
+				SayPenisConstants.ERROR_INTERNAL_ERROR);
+		asyncResponse.resume(Response.ok(gson.toJson(errorResultBean)).build());
+	}
+	
+	private void writeResultToDynamoAndS3(ResultBean result, byte[] fileContents) {
+		SuccessResultBean successBean = (SuccessResultBean) result;
+		try {
+			SayPenisAwsUtils.storeToDynamoAsync(SayPenisConfiguration.roundTable(), 
+					successBean, AwsSupplier.getDynamo());
+			SayPenisAwsUtils.storeToS3Async(successBean.s3bucket, 
+					successBean.s3key, fileContents, AwsSupplier.getTransferManager());
+		} catch (Exception e) {
+			log.error("Failed to store result to AWS for result={} with exception={}", result, e, e);
 		}
 	}
 	
-	private ResultBean handlePost(			
-			final byte[] fileContents,
-			final long lat,
-			final long lon,
-			final String userId,
-			final String name) throws IOException {
-		// Generate timestamp, roundId, s3key
+	private ResultBean createRoundMetadataAndScoreAudio(byte[] fileContents, long lat, long lon,
+			String userId, String name) throws IOException {
 		long date = System.currentTimeMillis();
 		UUID roundId = UUID.randomUUID();
 		String s3Key = "round_" + roundId.toString();
