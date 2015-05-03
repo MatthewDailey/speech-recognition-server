@@ -13,14 +13,14 @@ public class StatusResource {
 	public static final String ENDPOINT_STATUS = "ENDPOINT_STATUS";
 	
 	public enum EndpointStatus {
-		OFFLINE, LOW_AVAILABILITY, ONLINE
+		READ_ONLY, READ_WRITE
 	}
 	
 	private static final Logger log = LoggerFactory.getLogger(StatusResource.class);
 	
 	public static EndpointStatus getStatus() {
 		return EndpointStatus.valueOf(
-				System.getProperty(ENDPOINT_STATUS, EndpointStatus.OFFLINE.name()));
+				System.getProperty(ENDPOINT_STATUS, EndpointStatus.READ_ONLY.name()));
 	}
 	
 	@GET 

@@ -55,10 +55,10 @@ public class RecognizeUploadResource {
 			@DefaultValue(SayPenisConstants.DEFAULT_USER_ID) @FormDataParam("user_id") String userId,
 			@FormDataParam("name") String name) {
 		
-		if (StatusResource.getStatus() == EndpointStatus.OFFLINE) {
-			respondErrorOffline(asyncResponse);
-		} else {
+		if (StatusResource.getStatus() == EndpointStatus.READ_WRITE) {
 			launchAsyncResponseThread(asyncResponse, fileInputStream, fileDisposition, lat, lon, userId, name);
+		} else {
+			respondErrorReadOnly(asyncResponse);
 		}
 	}
 	
@@ -87,11 +87,11 @@ public class RecognizeUploadResource {
 		}).start();
 	}
 	
-	private void respondErrorOffline(AsyncResponse asyncResponse) {
-		log.warn("Request to /recognize/upload rejected due to status={}", EndpointStatus.OFFLINE);
+	private void respondErrorReadOnly(AsyncResponse asyncResponse) {
+		log.warn("Request to /recognize/upload rejected due to status={}", EndpointStatus.READ_ONLY);
 		Gson gson = new Gson();
 		ErrorResultBean errorResultBean = new ErrorResultBean(
-				SayPenisConstants.ERROR_SERVICE_OFFLINE);
+				SayPenisConstants.ERROR_SERVICE_READ_ONLY);
 		asyncResponse.resume(Response.ok(gson.toJson(errorResultBean)).build());
 	}
 	

@@ -26,22 +26,15 @@ public class StatusResourceTest extends JerseyTest {
 	@Test
 	public void testStatusDefault() {
 		String status = target("status").request().get(String.class);
-		assertEquals("OFFLINE", status);
+		assertEquals("READ_ONLY", status);
 	}
 	
 	@Test
 	public void testStatusSetOnline() {
-		String expectStatus = "ONLINE";
+		String expectStatus = "READ_WRITE";
 		System.setProperty(StatusResource.ENDPOINT_STATUS, expectStatus);
 		String status = target("status").request().get(String.class);
 		assertEquals(expectStatus, status);
 	}
 	
-	@Test
-	public void testStatusSetLowAvailability() {
-		String expectStatus = "LOW_AVAILABILITY";
-		System.setProperty(StatusResource.ENDPOINT_STATUS, expectStatus);
-		String status = target("status").request().get(String.class);
-		assertEquals(expectStatus, status);
-	}
 }
