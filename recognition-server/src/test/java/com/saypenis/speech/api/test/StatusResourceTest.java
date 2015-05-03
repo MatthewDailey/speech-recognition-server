@@ -6,6 +6,7 @@ import javax.ws.rs.core.Application;
 
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
+import org.junit.After;
 import org.junit.Test;
 
 import com.saypenis.speech.api.StatusResource;
@@ -15,6 +16,11 @@ public class StatusResourceTest extends JerseyTest {
 	@Override
 	protected Application configure() {
 		return new ResourceConfig(StatusResource.class);
+	}
+	
+	@After
+	public void after() {
+		System.clearProperty(StatusResource.ENDPOINT_STATUS);		
 	}
 	
 	@Test
@@ -29,7 +35,6 @@ public class StatusResourceTest extends JerseyTest {
 		System.setProperty(StatusResource.ENDPOINT_STATUS, expectStatus);
 		String status = target("status").request().get(String.class);
 		assertEquals(expectStatus, status);
-		System.clearProperty(StatusResource.ENDPOINT_STATUS);
 	}
 	
 	@Test
@@ -38,6 +43,5 @@ public class StatusResourceTest extends JerseyTest {
 		System.setProperty(StatusResource.ENDPOINT_STATUS, expectStatus);
 		String status = target("status").request().get(String.class);
 		assertEquals(expectStatus, status);
-		System.clearProperty(StatusResource.ENDPOINT_STATUS);
 	}
 }

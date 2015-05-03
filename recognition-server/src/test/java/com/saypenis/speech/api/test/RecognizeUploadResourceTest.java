@@ -17,6 +17,7 @@ import org.glassfish.jersey.media.multipart.FormDataMultiPart;
 import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
+import org.junit.After;
 import org.junit.Test;
 
 import com.google.gson.Gson;
@@ -43,6 +44,11 @@ public class RecognizeUploadResourceTest extends JerseyTest {
 	@Override
 	protected void configureClient(ClientConfig config) {
 		config.register(MultiPartFeature.class);
+	}
+	
+	@After
+	public void after() {
+		System.clearProperty(StatusResource.ENDPOINT_STATUS);		
 	}
 	
 	@Test

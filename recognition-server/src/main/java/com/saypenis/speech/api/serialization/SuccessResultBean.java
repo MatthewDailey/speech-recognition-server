@@ -28,5 +28,14 @@ public class SuccessResultBean extends ResultBean {
 		this.user_id = user_id;
 		this.transcription = transcription;
 	}
+
+	@Override
+	public String toString() {
+		return "SuccessResultBean [round_id=" + round_id + ", date=" + date
+				+ ", lat=" + lat + ", lon=" + lon + ", name=" + name
+				+ ", score=" + score + ", s3bucket=" + s3bucket + ", s3key="
+				+ s3key + ", user_id=" + user_id + ", transcription="
+				+ transcription + ", success=" + success + "]";
+	}
 	
 }

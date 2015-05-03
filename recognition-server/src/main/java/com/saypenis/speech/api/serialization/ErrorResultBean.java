@@ -8,5 +8,11 @@ public class ErrorResultBean extends ResultBean {
 		super(false /*success*/);
 		this.resultCode = resultCode;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "ErrorResultBean [resultCode=" + resultCode + ", success="
+				+ success + "]";
+	}
+
 }

@@ -75,21 +75,29 @@ public class RecognizeUploadResource {
 					
 					asyncResponse.resume(Response.ok(gson.toJson(result)).build());
 					
-					if (result.success) {
-						SuccessResultBean successBean = (SuccessResultBean) result;
-						SayPenisAwsUtils.storeToDynamoAsync(SayPenisConfiguration.roundTable(), 
-								successBean, AwsSupplier.getDynamo());
-						SayPenisAwsUtils.storeToS3Async(successBean.s3bucket, 
-								successBean.s3key, fileContents, AwsSupplier.getTransferManager());
-					}
+					handleResult(result, fileContents);
 				} catch (Exception e) {
-					log.error("Async failed with Exception {}", e, e);
+					log.error("Async /recognize/upload failed with Exception {}", e, e);
 					ErrorResultBean errorResultBean = new ErrorResultBean(
 							SayPenisConstants.ERROR_INTERNAL_ERROR);
 					asyncResponse.resume(Response.ok(gson.toJson(errorResultBean)).build());
 				}
 			}
 		}).start();
+	}
+	
+	private void handleResult(ResultBean result, byte[] fileContents) {
+		if (result.success) {
+			SuccessResultBean successBean = (SuccessResultBean) result;
+			try {
+				SayPenisAwsUtils.storeToDynamoAsync(SayPenisConfiguration.roundTable(), 
+						successBean, AwsSupplier.getDynamo());
+				SayPenisAwsUtils.storeToS3Async(successBean.s3bucket, 
+						successBean.s3key, fileContents, AwsSupplier.getTransferManager());
+			} catch (Exception e) {
+				log.warn("Failed to store result to AWS for result={} with exception={}", result, e, e);
+			}
+		}
 	}
 	
 	private ResultBean handlePost(			
