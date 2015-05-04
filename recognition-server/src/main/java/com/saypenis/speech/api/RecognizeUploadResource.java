@@ -27,7 +27,7 @@ import com.saypenis.speech.SayPenisConstants;
 import com.saypenis.speech.api.StatusResource.EndpointStatus;
 import com.saypenis.speech.api.serialization.ErrorResultBean;
 import com.saypenis.speech.api.serialization.ResultBean;
-import com.saypenis.speech.api.serialization.SuccessResultBean;
+import com.saypenis.speech.api.serialization.RoundBean;
 import com.saypenis.speech.api.serialization.SerializationUtils;
 import com.saypenis.speech.aws.AwsSupplier;
 import com.saypenis.speech.aws.SayPenisAwsUtils;
@@ -104,7 +104,7 @@ public class RecognizeUploadResource {
 	}
 	
 	private void writeResultToDynamoAndS3(ResultBean result, byte[] fileContents) {
-		SuccessResultBean successBean = (SuccessResultBean) result;
+		RoundBean successBean = (RoundBean) result;
 		try {
 			SayPenisAwsUtils.storeToDynamoAsync(SayPenisConfiguration.roundTable(), 
 					successBean, AwsSupplier.getDynamo());
@@ -135,7 +135,7 @@ public class RecognizeUploadResource {
 		
 		resourceTimer.log();
 		if (score.isPresent()) {
-			return new SuccessResultBean(roundId.toString(), date, lat, lon, name, score.get(), 
+			return new RoundBean(roundId.toString(), date, lat, lon, name, score.get(), 
 					SayPenisConfiguration.roundS3Bucket(), s3Key, userId, transcription);
 		} else {
 			int resultCode = SayPenisScoringUtils.getErrorResultCode(wordResults);

@@ -48,4 +48,16 @@ public final class SayPenisConfiguration {
 			throw new IllegalStateException("Unknown deployent environment.");
 		}
 	}
+	
+	public static final String READ_PAGE_SIZE_PARAM = "READ_PAGE_SIZE";
+	public static final String READ_PAGE_SIZE_DEFAULT = "20";
+	public static int readPageSize() {
+		return Integer.valueOf(System.getProperty(READ_PAGE_SIZE_PARAM, READ_PAGE_SIZE_DEFAULT));
+	}
+	
+	public static final String ROUND_CACHE_SIZE_PARAM = "ROUND_CACHE_SIZE";
+	public static final String ROUND_CACHE_SIZE_DEFAULT = "2000";
+	public static int readCacheSize() {
+		return Integer.valueOf(System.getProperty(ROUND_CACHE_SIZE_PARAM, ROUND_CACHE_SIZE_DEFAULT));
+	}
 }

@@ -1,6 +1,6 @@
 package com.saypenis.speech.api.serialization;
 
-public class SuccessResultBean extends ResultBean {
+public class RoundBean extends ResultBean {
 
 	public final String round_id;
 	public final long date;
@@ -13,7 +13,7 @@ public class SuccessResultBean extends ResultBean {
 	public final String user_id;
 	public final String transcription;
 	
-	public SuccessResultBean(String round_id, long date, long lat, long lon,
+	public RoundBean(String round_id, long date, long lat, long lon,
 			String name, double score, String s3bucket, String s3key, String user_id,
 			String transcription) {
 		super(true /* success */);

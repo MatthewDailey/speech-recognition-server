@@ -1,4 +1,4 @@
-package com.saypenis.speech.api.test;
+package com.saypenis.speech.api;
 
 import static org.junit.Assert.assertEquals;
 

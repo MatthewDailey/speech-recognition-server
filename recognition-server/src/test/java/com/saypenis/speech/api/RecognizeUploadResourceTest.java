@@ -1,4 +1,4 @@
-package com.saypenis.speech.api.test;
+package com.saypenis.speech.api;
 
 import static org.junit.Assert.*;
 
@@ -25,7 +25,7 @@ import com.saypenis.speech.SayPenisConstants;
 import com.saypenis.speech.api.RecognizeUploadResource;
 import com.saypenis.speech.api.StatusResource;
 import com.saypenis.speech.api.serialization.ErrorResultBean;
-import com.saypenis.speech.api.serialization.SuccessResultBean;
+import com.saypenis.speech.api.serialization.RoundBean;
 
 public class RecognizeUploadResourceTest extends JerseyTest {
 
@@ -65,8 +65,8 @@ public class RecognizeUploadResourceTest extends JerseyTest {
 		System.setProperty(StatusResource.ENDPOINT_STATUS, "ONLINE");
 		
 		Gson gson = new Gson();
-		SuccessResultBean resultBean = gson.fromJson(makeApiCall("src/test/java/com/saypenis/speech/api/test/resources/clean_test_penis.wav"), 
-				SuccessResultBean.class);
+		RoundBean resultBean = gson.fromJson(makeApiCall("src/test/java/com/saypenis/speech/api/test/resources/clean_test_penis.wav"), 
+				RoundBean.class);
 		assertTrue(resultBean.success);
 		assertEquals(testLat, resultBean.lat);
 		assertEquals(testLon, resultBean.lon);

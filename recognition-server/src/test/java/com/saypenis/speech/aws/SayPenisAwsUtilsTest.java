@@ -1,4 +1,4 @@
-package com.saypenis.speech.aws.test;
+package com.saypenis.speech.aws;
 
 import static org.junit.Assert.*;
 
@@ -16,7 +16,7 @@ import com.amazonaws.services.dynamodbv2.model.GetItemRequest;
 import com.amazonaws.services.dynamodbv2.model.GetItemResult;
 import com.amazonaws.services.s3.transfer.Upload;
 import com.google.common.collect.Maps;
-import com.saypenis.speech.api.serialization.SuccessResultBean;
+import com.saypenis.speech.api.serialization.RoundBean;
 import com.saypenis.speech.aws.AwsSupplier;
 import com.saypenis.speech.aws.SayPenisAwsUtils;
 import com.saypenis.speech.aws.SayPenisConfiguration;
@@ -25,7 +25,7 @@ public class SayPenisAwsUtilsTest {
 
 	@Test
 	public void testDynamoPut() {
-		SuccessResultBean beanToStore = new SuccessResultBean("test_round_id", 10, 5, 5, "test_name", 
+		RoundBean beanToStore = new RoundBean("test_round_id", 10, 5, 5, "test_name", 
 				99, "test_s3bucket", "test_s3key", "test_user_id", "test transcription");
 		
 		SayPenisAwsUtils.storeToDynamoAsync(SayPenisConfiguration.roundTable(), beanToStore, 

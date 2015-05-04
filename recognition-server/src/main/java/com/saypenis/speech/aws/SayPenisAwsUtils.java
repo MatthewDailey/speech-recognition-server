@@ -12,7 +12,7 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.Upload;
 import com.google.common.collect.ImmutableMap;
-import com.saypenis.speech.api.serialization.SuccessResultBean;
+import com.saypenis.speech.api.serialization.RoundBean;
 
 public final class SayPenisAwsUtils {
 
@@ -31,12 +31,12 @@ public final class SayPenisAwsUtils {
 		return transferManager.upload(s3bucket, s3Key, new ByteArrayInputStream(fileContents), objectMetadata);
 	}
 	
-	public static void storeToDynamoAsync(String tableName, SuccessResultBean resultBean, 
+	public static void storeToDynamoAsync(String tableName, RoundBean resultBean, 
 			AmazonDynamoDB dynamo) {
 		dynamo.putItem(tableName, successBeanToAttributeValues(resultBean));
 	}
 	
-	public static Map<String, AttributeValue> successBeanToAttributeValues(SuccessResultBean resultBean) {
+	public static Map<String, AttributeValue> successBeanToAttributeValues(RoundBean resultBean) {
 		ImmutableMap.Builder<String, AttributeValue> columnToAttributeValue = ImmutableMap.builder();
 		
 		String uri = getS3Uri(resultBean.s3bucket, resultBean.s3key);
