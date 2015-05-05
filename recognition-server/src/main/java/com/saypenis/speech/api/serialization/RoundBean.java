@@ -8,13 +8,12 @@ public class RoundBean extends ResultBean {
 	public final long lon;
 	public final String name;
 	public final double score;
-	public final String s3bucket;
-	public final String s3key;
+	public final String uri;
 	public final String user_id;
 	public final String transcription;
 	
 	public RoundBean(String round_id, long date, long lat, long lon,
-			String name, double score, String s3bucket, String s3key, String user_id,
+			String name, double score, String uri, String user_id,
 			String transcription) {
 		super(true /* success */);
 		this.round_id = round_id;
@@ -23,19 +22,70 @@ public class RoundBean extends ResultBean {
 		this.lon = lon;
 		this.name = name;
 		this.score = score;
-		this.s3bucket = s3bucket;
-		this.s3key = s3key;
+		this.uri = uri;
 		this.user_id = user_id;
 		this.transcription = transcription;
 	}
 
 	@Override
 	public String toString() {
-		return "SuccessResultBean [round_id=" + round_id + ", date=" + date
-				+ ", lat=" + lat + ", lon=" + lon + ", name=" + name
-				+ ", score=" + score + ", s3bucket=" + s3bucket + ", s3key="
-				+ s3key + ", user_id=" + user_id + ", transcription="
-				+ transcription + ", success=" + success + "]";
+		return "RoundBean [round_id=" + round_id + ", date=" + date + ", lat="
+				+ lat + ", lon=" + lon + ", name=" + name + ", score=" + score
+				+ ", uri=" + uri + ", user_id=" + user_id + ", transcription="
+				+ transcription + "]";
 	}
-	
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + (int) (date ^ (date >>> 32));
+		result = prime * result + ((name == null) ? 0 : name.hashCode());
+		result = prime * result
+				+ ((round_id == null) ? 0 : round_id.hashCode());
+		long temp;
+		temp = Double.doubleToLongBits(score);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result + ((uri == null) ? 0 : uri.hashCode());
+		result = prime * result + ((user_id == null) ? 0 : user_id.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		RoundBean other = (RoundBean) obj;
+		if (date != other.date)
+			return false;
+		if (name == null) {
+			if (other.name != null)
+				return false;
+		} else if (!name.equals(other.name))
+			return false;
+		if (round_id == null) {
+			if (other.round_id != null)
+				return false;
+		} else if (!round_id.equals(other.round_id))
+			return false;
+		if (Double.doubleToLongBits(score) != Double
+				.doubleToLongBits(other.score))
+			return false;
+		if (uri == null) {
+			if (other.uri != null)
+				return false;
+		} else if (!uri.equals(other.uri))
+			return false;
+		if (user_id == null) {
+			if (other.user_id != null)
+				return false;
+		} else if (!user_id.equals(other.user_id))
+			return false;
+		return true;
+	}
+
 }

@@ -60,4 +60,10 @@ public final class SayPenisConfiguration {
 	public static int readCacheSize() {
 		return Integer.valueOf(System.getProperty(ROUND_CACHE_SIZE_PARAM, ROUND_CACHE_SIZE_DEFAULT));
 	}
+	
+	public final static String CACHE_REFRESH_MILLIS_PARAM = "CACHE_REFRESH_MILLIS";
+	public final static String CACHE_REFRESH_MILLIS_DEFAULT = "5000";
+	public static int readCacheRefreshMillis() {
+		return Integer.valueOf(System.getProperty(CACHE_REFRESH_MILLIS_PARAM, CACHE_REFRESH_MILLIS_DEFAULT));
+	}
 }

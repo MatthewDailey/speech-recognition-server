@@ -108,8 +108,8 @@ public class RecognizeUploadResource {
 		try {
 			SayPenisAwsUtils.storeToDynamoAsync(SayPenisConfiguration.roundTable(), 
 					successBean, AwsSupplier.getDynamo());
-			SayPenisAwsUtils.storeToS3Async(successBean.s3bucket, 
-					successBean.s3key, fileContents, AwsSupplier.getTransferManager());
+			SayPenisAwsUtils.storeToS3Async(successBean.uri, fileContents, 
+					AwsSupplier.getTransferManager());
 		} catch (Exception e) {
 			log.error("Failed to store result to AWS for result={} with exception={}", result, e, e);
 		}
@@ -119,7 +119,8 @@ public class RecognizeUploadResource {
 			String userId, String name) throws IOException {
 		long date = System.currentTimeMillis();
 		UUID roundId = UUID.randomUUID();
-		String s3Key = "round_" + roundId.toString();
+		String s3uri = SayPenisAwsUtils.getS3Uri(SayPenisConfiguration.roundS3Bucket(), 
+				"round_" + roundId.toString());
 		
 		log.debug("Received POST to /recognize/upload for round {}.", roundId);
 		log.debug("Round {} has size {} bytes", roundId, fileContents.length);
@@ -135,8 +136,8 @@ public class RecognizeUploadResource {
 		
 		resourceTimer.log();
 		if (score.isPresent()) {
-			return new RoundBean(roundId.toString(), date, lat, lon, name, score.get(), 
-					SayPenisConfiguration.roundS3Bucket(), s3Key, userId, transcription);
+			return new RoundBean(roundId.toString(), date, lat, lon, name, score.get(), s3uri, 
+					userId, transcription);
 		} else {
 			int resultCode = SayPenisScoringUtils.getErrorResultCode(wordResults);
 			return new ErrorResultBean(resultCode);

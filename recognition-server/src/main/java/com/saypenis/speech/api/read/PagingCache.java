@@ -3,38 +3,32 @@ package com.saypenis.speech.api.read;
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 
-import javax.inject.Singleton;
-
 import org.apache.http.annotation.ThreadSafe;
 
-import com.google.common.annotations.VisibleForTesting;
-import com.saypenis.speech.aws.SayPenisConfiguration;
+import com.google.common.base.Supplier;
 
 @ThreadSafe
-@Singleton
-public final class PagingCache<T> {
+public class PagingCache<T> {
 
-	// TODO (mdailey): Initialize with dynamo based PageLoader.
-	
-	@VisibleForTesting
-	PagingCache(PageLoader<T> pageSupplier) {
+	public PagingCache(PageLoader<T> pageSupplier, Supplier<Integer> pageSizeSupplier) {
 		this.pageSupplier = pageSupplier;
+		this.pageSizeSupplier = pageSizeSupplier;
 	}
 	
+	private final Supplier<Integer> pageSizeSupplier;
 	private final PageLoader<T> pageSupplier;
 	
-	private final AtomicReference<T[]> topRounds = 
-			new AtomicReference<T[]>(newEmptyTArray()); 
+	private final AtomicReference<T[]> cachedPages = new AtomicReference<T[]>(); 
 				
-	public PageLoader<T> getTopRoundPageLoader() {
+	public PageLoader<T> getPageLoader() {
 		return new PageLoader<T>() {
 			@Override
 			public T[] getPage(int page, int pageSize) {
-				T[] topRoundsArray = topRounds.get();
+				T[] cacheArray = getCacheArray();
 				int startIndexInclusive = getStart(page, pageSize);
-				int endIndexExclusive = getEndIndex(topRoundsArray.length, page, pageSize);
-				if (startIndexInclusive < topRoundsArray.length) {
-					return Arrays.copyOfRange(topRoundsArray, startIndexInclusive, endIndexExclusive);	
+				int endIndexExclusive = getEndIndex(cacheArray.length, page, pageSize);
+				if (startIndexInclusive < cacheArray.length) {
+					return Arrays.copyOfRange(cacheArray, startIndexInclusive, endIndexExclusive);	
 				} else {
 					return newEmptyTArray();
 				}
@@ -49,11 +43,20 @@ public final class PagingCache<T> {
 			}
 		};
 	}
-	
-	public void refreshCache() {
-		topRounds.set(pageSupplier.getPage(0, SayPenisConfiguration.readCacheSize()));
-	}
 
+	private T[] getCacheArray() {
+		T[] cacheArray = cachedPages.get();
+		if (cacheArray == null) {
+			refresh();
+			cacheArray = cachedPages.get();
+		}
+		return cacheArray;
+	}
+	
+	public void refresh() {
+		cachedPages.set(pageSupplier.getPage(0, pageSizeSupplier.get()));
+	}
+	
 	@SuppressWarnings("unchecked")
 	private T[] newEmptyTArray() {
 		return (T[]) new Object[0];

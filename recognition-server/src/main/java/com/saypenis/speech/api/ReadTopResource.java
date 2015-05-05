@@ -6,30 +6,29 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.google.gson.Gson;
+import com.saypenis.speech.api.read.PagingCaches;
+import com.saypenis.speech.api.serialization.RoundBean;
 import com.saypenis.speech.aws.SayPenisConfiguration;
 import com.saypenis.speech.perf.PerfUtils;
 import com.saypenis.speech.perf.PerfUtils.LoggingTimer;
 
-@Path("read/top")
+@Path("/read/top")
 public class ReadTopResource {
-	private final static Logger log = LoggerFactory.getLogger(ReadTopResource.class);
 	
 	@GET 
 	@Produces("application/json")
-	public void get(@DefaultValue("0") 
+	public String get(@DefaultValue("0") 
 					@QueryParam("page") int page,
 					@DefaultValue(SayPenisConfiguration.READ_PAGE_SIZE_DEFAULT) 
-					@QueryParam("page_size") int page_size) {
-		LoggingTimer resourceTimer = PerfUtils.getTimerStarted("/read/top page=" + page);
+					@QueryParam("page_size") int pageSize) {
+		LoggingTimer resourceTimer = PerfUtils.getTimerStarted("/read/top page=" + page + 
+				" page_size=" + pageSize);
 		
-		// TODO (mdailey): Have cache.
-		
-		// Read top page size from dynamo.
-		// multiple paging strategies.
+		RoundBean[] roundPage = PagingCaches.topRounds.getPageLoader().getPage(page, pageSize);
 		
 		resourceTimer.log();
+		Gson gson = new Gson();
+		return gson.toJson(roundPage);
 	}
 }

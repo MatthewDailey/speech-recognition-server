@@ -26,7 +26,7 @@ public class SayPenisAwsUtilsTest {
 	@Test
 	public void testDynamoPut() {
 		RoundBean beanToStore = new RoundBean("test_round_id", 10, 5, 5, "test_name", 
-				99, "test_s3bucket", "test_s3key", "test_user_id", "test transcription");
+				99, "test_s3_uri", "test_user_id", "test transcription");
 		
 		SayPenisAwsUtils.storeToDynamoAsync(SayPenisConfiguration.roundTable(), beanToStore, 
 				AwsSupplier.getDynamo());
@@ -46,8 +46,9 @@ public class SayPenisAwsUtilsTest {
 		String fileContents = "file contents string";
 		byte[] fileContentsBytes = fileContents.getBytes();
 		String s3key = "SayPenisAwsUtilsTest.txt";
-		Upload upload = SayPenisAwsUtils.storeToS3Async(SayPenisConfiguration.roundS3Bucket(), s3key, fileContentsBytes,
-				AwsSupplier.getTransferManager());
+		Upload upload = SayPenisAwsUtils.storeToS3Async(
+				SayPenisAwsUtils.getS3Uri(SayPenisConfiguration.roundS3Bucket(), s3key), 
+				fileContentsBytes, AwsSupplier.getTransferManager());
 		
 		upload.waitForCompletion();
 		
