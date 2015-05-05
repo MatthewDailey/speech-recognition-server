@@ -24,6 +24,7 @@ import com.google.gson.Gson;
 import com.saypenis.speech.SayPenisConstants;
 import com.saypenis.speech.api.RecognizeUploadResource;
 import com.saypenis.speech.api.StatusResource;
+import com.saypenis.speech.api.StatusResource.EndpointStatus;
 import com.saypenis.speech.api.serialization.ErrorResultBean;
 import com.saypenis.speech.api.serialization.RoundBean;
 
@@ -62,7 +63,7 @@ public class RecognizeUploadResourceTest extends JerseyTest {
 	
 	@Test
 	public void testRecognizeValidUpload() throws Throwable {
-		System.setProperty(StatusResource.ENDPOINT_STATUS, "ONLINE");
+		System.setProperty(StatusResource.ENDPOINT_STATUS, EndpointStatus.READ_WRITE.name());
 		
 		Gson gson = new Gson();
 		RoundBean resultBean = gson.fromJson(makeApiCall("src/test/java/com/saypenis/speech/api/test/resources/clean_test_penis.wav"), 
@@ -76,7 +77,7 @@ public class RecognizeUploadResourceTest extends JerseyTest {
 	
 	@Test
 	public void testRecognizeTooManyPenisesUpload() throws Throwable {
-		System.setProperty(StatusResource.ENDPOINT_STATUS, "ONLINE");
+		System.setProperty(StatusResource.ENDPOINT_STATUS, EndpointStatus.READ_WRITE.name());
 		
 		Gson gson = new Gson();
 		ErrorResultBean resultBean = gson.fromJson(
@@ -88,7 +89,7 @@ public class RecognizeUploadResourceTest extends JerseyTest {
 	
 	@Test
 	public void testRecognizeNonPenisesUpload() throws Throwable {
-		System.setProperty(StatusResource.ENDPOINT_STATUS, "ONLINE");
+		System.setProperty(StatusResource.ENDPOINT_STATUS, EndpointStatus.READ_WRITE.name());
 		
 		Gson gson = new Gson();
 		ErrorResultBean resultBean = gson.fromJson(
@@ -113,7 +114,7 @@ public class RecognizeUploadResourceTest extends JerseyTest {
 		try {
 			Future<String> result = target("recognize/upload").request(MediaType.MULTIPART_FORM_DATA_TYPE).async()
 				.post(Entity.entity(form, form.getMediaType()), String.class);
-			return result.get(10, TimeUnit.SECONDS);
+			return result.get(90, TimeUnit.SECONDS); 
 		} finally {
 			form.close();
 		}
