@@ -1,6 +1,8 @@
 package com.saypenis.speech.api;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -18,16 +20,16 @@ import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ResourceConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.gson.Gson;
 import com.saypenis.speech.SayPenisConstants;
-import com.saypenis.speech.api.RecognizeUploadResource;
-import com.saypenis.speech.api.StatusResource;
 import com.saypenis.speech.api.StatusResource.EndpointStatus;
 import com.saypenis.speech.api.serialization.ErrorResultBean;
 import com.saypenis.speech.api.serialization.RoundBean;
 
+@Ignore
 public class RecognizeUploadResourceTest extends JerseyTest {
 
 	private final static long testLat = 10;
