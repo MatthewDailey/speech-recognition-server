@@ -1,9 +1,14 @@
 package com.saypenis.speech.api.serialization;
 
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 public class RoundBean extends ResultBean {
 
 	public final String round_id;
 	public final long date;
+	public final String dateString;
 	public final long lat;
 	public final long lon;
 	public final String name;
@@ -18,6 +23,7 @@ public class RoundBean extends ResultBean {
 		super(true /* success */);
 		this.round_id = round_id;
 		this.date = date;
+		this.dateString = convertTime(date);
 		this.lat = lat;
 		this.lon = lon;
 		this.name = name;
@@ -26,13 +32,11 @@ public class RoundBean extends ResultBean {
 		this.user_id = user_id;
 		this.transcription = transcription;
 	}
-
-	@Override
-	public String toString() {
-		return "RoundBean [round_id=" + round_id + ", date=" + date + ", lat="
-				+ lat + ", lon=" + lon + ", name=" + name + ", score=" + score
-				+ ", uri=" + uri + ", user_id=" + user_id + ", transcription="
-				+ transcription + "]";
+	
+	private String convertTime(long time){
+	    Date date = new Date(time);
+	    Format format = new SimpleDateFormat("HH:mm:ss MM/dd/yyyy");
+	    return format.format(date);
 	}
 
 	@Override
@@ -40,12 +44,16 @@ public class RoundBean extends ResultBean {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + (int) (date ^ (date >>> 32));
+		result = prime * result + (int) (lat ^ (lat >>> 32));
+		result = prime * result + (int) (lon ^ (lon >>> 32));
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result
 				+ ((round_id == null) ? 0 : round_id.hashCode());
 		long temp;
 		temp = Double.doubleToLongBits(score);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
+		result = prime * result
+				+ ((transcription == null) ? 0 : transcription.hashCode());
 		result = prime * result + ((uri == null) ? 0 : uri.hashCode());
 		result = prime * result + ((user_id == null) ? 0 : user_id.hashCode());
 		return result;
@@ -62,6 +70,10 @@ public class RoundBean extends ResultBean {
 		RoundBean other = (RoundBean) obj;
 		if (date != other.date)
 			return false;
+		if (lat != other.lat)
+			return false;
+		if (lon != other.lon)
+			return false;
 		if (name == null) {
 			if (other.name != null)
 				return false;
@@ -75,6 +87,11 @@ public class RoundBean extends ResultBean {
 		if (Double.doubleToLongBits(score) != Double
 				.doubleToLongBits(other.score))
 			return false;
+		if (transcription == null) {
+			if (other.transcription != null)
+				return false;
+		} else if (!transcription.equals(other.transcription))
+			return false;
 		if (uri == null) {
 			if (other.uri != null)
 				return false;
@@ -86,6 +103,15 @@ public class RoundBean extends ResultBean {
 		} else if (!user_id.equals(other.user_id))
 			return false;
 		return true;
+	}
+
+	@Override
+	public String toString() {
+		return "RoundBean [round_id=" + round_id + ", date=" + date
+				+ ", dateString=" + dateString + ", lat=" + lat + ", lon="
+				+ lon + ", name=" + name + ", score=" + score + ", uri=" + uri
+				+ ", user_id=" + user_id + ", transcription=" + transcription
+				+ "]";
 	}
 
 }
