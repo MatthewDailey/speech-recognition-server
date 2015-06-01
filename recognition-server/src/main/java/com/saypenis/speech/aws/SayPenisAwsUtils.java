@@ -61,8 +61,8 @@ public final class SayPenisAwsUtils {
 		AttributeValue transcriptionAttribute = attributeValues.get("transcription");
 		return new RoundBean(attributeValues.get("round_id").getS(),
 							 Long.valueOf(attributeValues.get("date").getN()), 
-							 Long.valueOf(attributeValues.get("lat").getN()), 
-							 Long.valueOf(attributeValues.get("lon").getN()), 
+							 Double.valueOf(attributeValues.get("lat").getN()), 
+							 Double.valueOf(attributeValues.get("lon").getN()), 
 							 attributeValues.get("name").getS(), 
 							 Double.valueOf(attributeValues.get("score").getN()), 
 							 attributeValues.get("uri").getS(), 

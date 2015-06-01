@@ -9,15 +9,15 @@ public class RoundBean extends ResultBean {
 	public final String round_id;
 	public final long date;
 	public final String dateString;
-	public final long lat;
-	public final long lon;
+	public final double lat;
+	public final double lon;
 	public final String name;
 	public final double score;
 	public final String uri;
 	public final String user_id;
 	public final String transcription;
 	
-	public RoundBean(String round_id, long date, long lat, long lon,
+	public RoundBean(String round_id, long date, double lat, double lon,
 			String name, double score, String uri, String user_id,
 			String transcription) {
 		super(true /* success */);
@@ -44,12 +44,16 @@ public class RoundBean extends ResultBean {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + (int) (date ^ (date >>> 32));
-		result = prime * result + (int) (lat ^ (lat >>> 32));
-		result = prime * result + (int) (lon ^ (lon >>> 32));
+		result = prime * result
+				+ ((dateString == null) ? 0 : dateString.hashCode());
+		long temp;
+		temp = Double.doubleToLongBits(lat);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
+		temp = Double.doubleToLongBits(lon);
+		result = prime * result + (int) (temp ^ (temp >>> 32));
 		result = prime * result + ((name == null) ? 0 : name.hashCode());
 		result = prime * result
 				+ ((round_id == null) ? 0 : round_id.hashCode());
-		long temp;
 		temp = Double.doubleToLongBits(score);
 		result = prime * result + (int) (temp ^ (temp >>> 32));
 		result = prime * result
@@ -70,9 +74,14 @@ public class RoundBean extends ResultBean {
 		RoundBean other = (RoundBean) obj;
 		if (date != other.date)
 			return false;
-		if (lat != other.lat)
+		if (dateString == null) {
+			if (other.dateString != null)
+				return false;
+		} else if (!dateString.equals(other.dateString))
 			return false;
-		if (lon != other.lon)
+		if (Double.doubleToLongBits(lat) != Double.doubleToLongBits(other.lat))
+			return false;
+		if (Double.doubleToLongBits(lon) != Double.doubleToLongBits(other.lon))
 			return false;
 		if (name == null) {
 			if (other.name != null)
