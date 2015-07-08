@@ -53,9 +53,7 @@ public class PagingCacheTest {
 			will(returnValue(new Integer[]{0,1,2,3,4}));
 		}});
 		
-		pagingCache.refresh();
 		PageLoader<Integer> cacheLoader = pagingCache.getPageLoader();
-
 		
 		assertArrayEquals(new Integer[]{0, 1}, cacheLoader.getPage(0, pageSize));
 		assertArrayEquals(new Integer[]{2, 3}, cacheLoader.getPage(1, pageSize));
@@ -65,7 +63,7 @@ public class PagingCacheTest {
 	}
 	
 	@Test
-	public void testRefresh() {
+	public void testRefresh() throws InterruptedException {
 		@SuppressWarnings("unchecked")
 		final PageLoader<Integer> pageLoader = (PageLoader<Integer>) mock.mock(PageLoader.class);
 		final int supplierPageSize = 10;
@@ -83,11 +81,11 @@ public class PagingCacheTest {
 
 		int pageSize = 6;
 		
-		pagingCache.refresh();
 		PageLoader<Integer> cacheLoader = pagingCache.getPageLoader();
 		assertArrayEquals(new Integer[]{0, 1}, cacheLoader.getPage(0, pageSize));
 		
-		pagingCache.refresh();
+		Thread.sleep(2000);
+		
 		PageLoader<Integer> cacheLoaderAfterRefresh = pagingCache.getPageLoader();
 		assertArrayEquals(new Integer[]{0, 1, 2, 3, 4}, cacheLoaderAfterRefresh.getPage(0, pageSize));
 		

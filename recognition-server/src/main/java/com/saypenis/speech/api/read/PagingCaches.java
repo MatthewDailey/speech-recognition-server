@@ -28,27 +28,10 @@ public final class PagingCaches {
 	private static final String dynamoGlobalDateIndex = "valid-date-index";
 	private static final String dynamoGlobalScoreIndex = "valid-score-index";
 	
-
-	private static final ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor(
-			new ThreadFactoryBuilder().setNameFormat("cache-refresh-thread").build());
-
-	static {
-		launchCacheRefreshThread();
-	}
-	
-	private static void launchCacheRefreshThread() {
-		executor.scheduleAtFixedRate(new Runnable() {
-			@Override
-			public void run() {
-				log.debug("Refreshing caches...");
-				topRounds.refresh();
-				log.debug("Cache refresh complete!");
-			}
-		}, 0, SayPenisConfiguration.readCacheRefreshMillis(),TimeUnit.MILLISECONDS);
-	}
-	
 	public final static PagingCache<RoundBean> topRounds = new PagingCache<RoundBean>(
-			new AwsRoundPageLoader(AwsSupplier.getDynamo(), SayPenisConfiguration.roundTable(), 
+			new AwsRoundPageLoader(
+					AwsSupplier.getDynamo(), 
+					SayPenisConfiguration.roundTable(), 
 					Optional.of(dynamoGlobalScoreIndex)),
 			Suppliers.memoizeWithExpiration(new Supplier<Integer>() {
 					@Override

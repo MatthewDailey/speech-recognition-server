@@ -12,6 +12,9 @@ import javax.inject.Singleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.saypenis.speech.api.StatusResource;
+import com.saypenis.speech.api.StatusResource.EndpointStatus;
+
 import edu.cmu.sphinx.api.Configuration;
 
 @Singleton
@@ -49,10 +52,15 @@ public final class RecognitionServiceProvider {
 	};
 	
 	private void enqueueNewRecognizerNonBlocking() {
-		executor.execute(enqueueRecognizerRunnable);
+		if (StatusResource.getStatus() == EndpointStatus.READ_WRITE) {
+			executor.execute(enqueueRecognizerRunnable);
+		}
 	}
 	
 	public static RecognitionService getCmuSphinxRecognizer() {
+		if (StatusResource.getStatus() == EndpointStatus.READ_ONLY) {
+			return new NoopRecognitionService();
+		}
 		RecognitionService result;
 		try {
 			result = new CmuSphinxRecognitionService(provider.recognizerQueue.poll(1, TimeUnit.MINUTES));
